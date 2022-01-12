@@ -70,5 +70,15 @@ lambdaSysSpec =
                      )
                  ]
 
+lambdaListSysSpec :: SystemSpec
+lambdaListSysSpec =
+  (undefined :: [Lambda], 1000)
+    `withSystem` [ specification
+                     (undefined :: [Lambda])
+                     ( withWeights
+                         ['Index ==> 0]
+                     )
+                 ]
+
 $(mkSampler ''DeBruijn)
 $(mkSampler ''Lambda)

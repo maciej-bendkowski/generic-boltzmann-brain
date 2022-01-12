@@ -140,6 +140,9 @@ mkDDGs variables = do
 
   return $ Map.fromList ddgs
 
+paganiniSpecIO :: S.SystemSpec -> IO (Either PaganiniError SystemDDGs)
+paganiniSpecIO = debugPaganini . paganiniSpec
+
 paganiniSpec :: S.SystemSpec -> Spec SystemDDGs
 paganiniSpec sys@(S.SystemSpec {S.targetType = target, S.meanSize = n}) = do
   let samplableTypes = S.collectTypes sys
@@ -157,13 +160,10 @@ paganiniSpec sys@(S.SystemSpec {S.targetType = target, S.meanSize = n}) = do
           }
 
   mkTypeVariables variables samplableTypes
-
   let (Let t) = varDefs Map.! typeName target
+
   tune t -- tune for target variable.
   mkDDGs variables
-
-paganiniSpecIO :: S.SystemSpec -> IO (Either PaganiniError SystemDDGs)
-paganiniSpecIO = debugPaganini . paganiniSpec
 
 systemDDGs :: S.SystemSpec -> IO SystemDDGs
 systemDDGs sys = do

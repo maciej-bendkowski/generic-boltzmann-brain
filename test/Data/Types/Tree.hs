@@ -31,7 +31,7 @@ expectedTypeDef =
   [Cons {name = "Data.Types.Tree.Node", args = [treeList]}]
 
 instance Size Tree where
-  size (Node xs) = 1 + sum (map size xs)
+  size (Node xs) = 1 + size xs
 
 treeSysSpec :: SystemSpec
 treeSysSpec =
