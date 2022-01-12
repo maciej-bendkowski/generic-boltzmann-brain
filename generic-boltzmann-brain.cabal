@@ -1,0 +1,84 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.4.
+--
+-- see: https://github.com/sol/hpack
+
+name:           generic-boltzmann-brain
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/maciej-bendkowski/generic-boltzmann-brain#readme>
+homepage:       https://github.com/maciej-bendkowski/generic-boltzmann-brain#readme
+bug-reports:    https://github.com/maciej-bendkowski/generic-boltzmann-brain/issues
+author:         Maciej Bendkowski
+maintainer:     maciej.bendkowski@gmail.com
+copyright:      2022 Maciej Bendkowski
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/maciej-bendkowski/generic-boltzmann-brain
+
+library
+  exposed-modules:
+      Data.Boltzmann.Oracle
+      Data.Boltzmann.Sampler
+      Data.Boltzmann.Sampler.Utils
+      Data.Boltzmann.Specifiable
+      Data.Boltzmann.Specification
+      Data.BuffonMachine
+  other-modules:
+      Paths_generic_boltzmann_brain
+  hs-source-dirs:
+      src
+  ghc-options: -O2 -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -Wno-name-shadowing -fwarn-missing-signatures -ddump-splices
+  build-depends:
+      base >=4.7 && <5
+    , containers >=0.6.4
+    , mtl >=2.2.2
+    , paganini-hs >=0.3.0.0
+    , random >=1.2.0
+    , template-haskell >=2.16.0.0
+    , th-abstraction >=0.4.3.0
+    , th-lift-instances >=0.1.18
+    , transformers >=0.5.6
+    , vector >=0.12.3.1
+  default-language: Haskell2010
+
+test-suite generic-boltzmann-brain-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Data.Samplers.BinTree
+      Data.Samplers.Lambda
+      Data.Samplers.Tree
+      Data.Types.BinTree
+      Data.Types.Lambda
+      Data.Types.Tree
+      Test.Unit.Sampler
+      Test.Unit.Specifiable
+      Test.Unit.Utils
+      Paths_generic_boltzmann_brain
+  hs-source-dirs:
+      test
+  ghc-options: -O2 -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -Wno-name-shadowing -fwarn-missing-signatures -ddump-splices
+  build-depends:
+      QuickCheck >=2.14.2
+    , base >=4.7 && <5
+    , containers >=0.6.4
+    , generic-boltzmann-brain
+    , mtl >=2.2.2
+    , paganini-hs >=0.3.0.0
+    , random >=1.2.0
+    , tasty >=1.4.2
+    , tasty-hunit >=0.10.0
+    , tasty-quickcheck >=0.10.0
+    , template-haskell >=2.16.0.0
+    , th-abstraction >=0.4.3.0
+    , th-lift-instances >=0.1.18
+    , transformers >=0.5.6
+    , vector >=0.12.3.1
+  default-language: Haskell2010

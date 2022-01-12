@@ -1,0 +1,7 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "generic-boltzmann-brain:lib"
+
+    - path: "./test"
+      component: "generic-boltzmann-brain:test:generic-boltzmann-brain-test"

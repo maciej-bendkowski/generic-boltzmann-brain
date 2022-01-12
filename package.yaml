@@ -1,0 +1,65 @@
+name:                generic-boltzmann-brain
+version:             0.1.0.0
+github:              "maciej-bendkowski/generic-boltzmann-brain"
+license:             BSD3
+author:              "Maciej Bendkowski"
+maintainer:          "maciej.bendkowski@gmail.com"
+copyright:           "2022 Maciej Bendkowski"
+
+extra-source-files:
+- README.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/maciej-bendkowski/generic-boltzmann-brain#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- containers >= 0.6.4
+- vector >= 0.12.3.1
+- random >= 1.2.0
+- transformers >= 0.5.6
+- template-haskell >= 2.16.0.0
+- th-abstraction >= 0.4.3.0
+- th-lift-instances >= 0.1.18
+- mtl >= 2.2.2
+- paganini-hs >= 0.3.0.0
+
+library:
+  source-dirs: src
+  ghc-options:
+  - -O2
+  - -Wall
+  - -Wcompat
+  - -Wincomplete-record-updates
+  - -Wincomplete-uni-patterns
+  - -Wredundant-constraints
+  - -Wno-name-shadowing
+  - -fwarn-missing-signatures
+  - -ddump-splices
+
+tests:
+  generic-boltzmann-brain-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -O2
+    - -Wall
+    - -Wcompat
+    - -Wincomplete-record-updates
+    - -Wincomplete-uni-patterns
+    - -Wredundant-constraints
+    - -Wno-name-shadowing
+    - -fwarn-missing-signatures
+    - -ddump-splices
+    dependencies:
+    - generic-boltzmann-brain
+    - tasty >= 1.4.2
+    - tasty-hunit >= 0.10.0
+    - tasty-quickcheck >= 0.10.0
+    - QuickCheck >= 2.14.2
