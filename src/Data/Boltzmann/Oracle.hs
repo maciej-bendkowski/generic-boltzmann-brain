@@ -10,12 +10,12 @@
 -- Maintainer  : maciej.bendkowski@gmail.com
 -- Stability   : experimental
 module Data.Boltzmann.Oracle
-  ( mkChoiceFun,
-    mkWeightFun,
+  ( mkSpecSampler,
   )
 where
 
 import Control.Monad (replicateM)
+import Data.Boltzmann.Sampler (BoltzmannSampler (sample))
 import Data.Boltzmann.Specifiable
   ( Cons (args, name),
     Specifiable (..),
@@ -199,3 +199,6 @@ mkWeightMatch sys cons = return $ Match (LitP (StringL s)) (NormalB $ LitE (Inte
   where
     s = name cons
     w = sys `S.getWeight` s
+
+mkSpecSampler :: S.SystemSpec -> Q Exp
+mkSpecSampler sys = [|sample $(mkChoiceFun sys) $(mkWeightFun sys)|]
