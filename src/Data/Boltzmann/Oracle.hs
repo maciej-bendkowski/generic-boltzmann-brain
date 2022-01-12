@@ -92,27 +92,26 @@ mkMarkingVariables sys = do
 
   return $ Map.fromList xs
 
--- FIXME: rename
-data Variables = Variables
+data Params = Params
   { sizeVar :: forall a. FromVariable a => a,
     typeVariable :: Map String Let,
     markingVariable :: Map String Let,
     systemSpec :: S.SystemSpec
   }
 
-mkTypeVariables :: Variables -> Set SpecifiableType -> Spec ()
+mkTypeVariables :: Params -> Set SpecifiableType -> Spec ()
 mkTypeVariables variables types =
   mapM_ (mkTypeVariable variables) (Set.toList types)
 
-mkTypeVariable :: Variables -> SpecifiableType -> Spec ()
+mkTypeVariable :: Params -> SpecifiableType -> Spec ()
 mkTypeVariable variables (SpecifiableType typ) = do
   let (Let x) = typeVariable variables Map.! typeName typ
   x .=. typeExpr variables (typedef typ)
 
-typeExpr :: Variables -> TypeDef -> Expr
+typeExpr :: Params -> TypeDef -> Expr
 typeExpr variables = sum' . map (consExpr variables)
 
-consExpr :: Variables -> Cons -> Expr
+consExpr :: Params -> Cons -> Expr
 consExpr variables cons = defaults u * z ^ w * product args'
   where
     z = sizeVar variables
@@ -120,7 +119,7 @@ consExpr variables cons = defaults u * z ^ w * product args'
     w = systemSpec variables `getWeight` name cons
     args' = map (argExpr variables) (args cons)
 
-argExpr :: Variables -> SpecifiableType -> Expr
+argExpr :: Params -> SpecifiableType -> Expr
 argExpr variables (SpecifiableType typ) =
   let Let x = typeVariable variables Map.! typeName typ in x
 
@@ -128,7 +127,7 @@ defaults :: (Num p, FromVariable p) => Maybe Let -> p
 defaults Nothing = 1
 defaults (Just (Let x)) = x
 
-mkDDGs :: Variables -> Spec SystemDDGs
+mkDDGs :: Params -> Spec SystemDDGs
 mkDDGs variables = do
   let typeList = Map.toList $ typeVariable variables
   ddgs <-
@@ -150,7 +149,7 @@ paganiniSpec sys@(S.SystemSpec {S.targetType = target, S.meanSize = n}) = do
   markDefs <- mkMarkingVariables sys
 
   let variables =
-        Variables
+        Params
           { sizeVar = z,
             typeVariable = varDefs,
             markingVariable = markDefs,
