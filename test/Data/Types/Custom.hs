@@ -11,6 +11,7 @@ import Data.Boltzmann.Specifiable
 import Data.Boltzmann.Specification
   ( SystemSpec,
     specification,
+    withFrequencies,
     withSystem,
     withWeights,
     (==>),
@@ -53,5 +54,9 @@ customSysSpec =
                            'ConsB ==> 3,
                            'ConsC ==> 4
                          ]
+                         . withFrequencies
+                           [ 'ConsA ==> 800,
+                             'ConsB ==> 900
+                           ]
                      )
                  ]

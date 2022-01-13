@@ -26,6 +26,9 @@ newtype Tree = Node [Tree]
 treeList :: SpecifiableType
 treeList = SpecifiableType (undefined :: [Tree])
 
+tree :: SpecifiableType
+tree = SpecifiableType (undefined :: Tree)
+
 expectedTypeDef :: TypeDef
 expectedTypeDef =
   [Cons {name = "Data.Types.Tree.Node", args = [treeList]}]

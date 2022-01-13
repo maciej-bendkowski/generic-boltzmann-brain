@@ -15,35 +15,35 @@ import Test.Tasty.HUnit (testCase, (@=?))
 unitTests :: TestTree
 unitTests =
   testGroup
-    "Specifiable"
+    "Specifiable unit tests"
     [typeDefinitionTests, typeNameTests]
 
 typeDefinitionTests :: TestTree
 typeDefinitionTests =
   testGroup
-    "Type definition tests"
-    [ testCase "BinTree is correctly mapped into a type definition" $
+    "Type definition unit tests"
+    [ testCase "BinTree has a correct type definition" $
         BinTree.expectedTypeDef @=? typedef (undefined :: BinTree),
-      testCase "Tree is correctly mapped into a type definition" $
+      testCase "Tree has a correct type definition" $
         Tree.expectedTypeDef @=? typedef (undefined :: Tree),
-      testCase "DeBruijn is correctly mapped into a type definition" $
+      testCase "DeBruijn has a correct type definition" $
         Lambda.expectedDeBruijnTypeDef @=? typedef (undefined :: DeBruijn),
-      testCase "Lambda is correctly mapped into a type definition" $
+      testCase "Lambda has a correct type definition" $
         Lambda.expectedLambdaTypeDef @=? typedef (undefined :: Lambda)
     ]
 
 typeNameTests :: TestTree
 typeNameTests =
   testGroup
-    "Type name tests"
-    [ testCase ("BinTree's type name is '" ++ show ''BinTree ++ "'") $
+    "Type name unit tests"
+    [ testCase "BinTree's type name is correct" $
         show ''BinTree @=? typeName (undefined :: BinTree),
-      testCase ("Tree's type name is '" ++ show ''Tree ++ "'") $
+      testCase "Tree's type name is correct" $
         show ''Tree @=? typeName (undefined :: Tree),
-      testCase ("Lambda's type name is '" ++ show ''Lambda ++ "'") $
+      testCase "Lambda's type name is correct" $
         show ''Lambda @=? typeName (undefined :: Lambda),
-      testCase "[DeBruijn]'s type name is [Data.Types.Lambda.DeBruijn]" $
+      testCase "[DeBruijn]'s type name is correct" $
         "[Data.Types.Lambda.DeBruijn]" @=? typeName (undefined :: [DeBruijn]),
-      testCase "[[DeBruijn]]'s type name is [[Data.Types.Lambda.DeBruijn]]" $
+      testCase "[[DeBruijn]]'s type name is correct" $
         "[[Data.Types.Lambda.DeBruijn]]" @=? typeName (undefined :: [[DeBruijn]])
     ]

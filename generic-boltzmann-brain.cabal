@@ -56,10 +56,12 @@ test-suite generic-boltzmann-brain-test
       Data.Samplers.Lambda
       Data.Samplers.Tree
       Data.Types.BinTree
+      Data.Types.Custom
       Data.Types.Lambda
       Data.Types.Tree
       Test.Unit.Sampler
       Test.Unit.Specifiable
+      Test.Unit.Specification
       Test.Unit.Utils
       Paths_generic_boltzmann_brain
   hs-source-dirs:
