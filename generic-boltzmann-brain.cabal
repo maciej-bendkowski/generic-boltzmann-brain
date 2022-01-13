@@ -59,6 +59,7 @@ test-suite generic-boltzmann-brain-test
       Data.Types.Custom
       Data.Types.Lambda
       Data.Types.Tree
+      Test.Unit.BuffonMachine
       Test.Unit.Sampler
       Test.Unit.Specifiable
       Test.Unit.Specification
