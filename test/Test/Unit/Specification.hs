@@ -27,7 +27,7 @@ unitTests :: TestTree
 unitTests =
   testGroup
     "Specification unit tests"
-    [typeSpecTests, collectTypesTests, getWeightTests, getFrequencyTests]
+    [typeSpecTests, collectTypesTests, constructorFrequenciesTests, getWeightTests, getFrequencyTests]
 
 collectTypesTests :: TestTree
 collectTypesTests =
@@ -45,6 +45,22 @@ collectTypesTests =
       testCase "Custom's types are collected correctly" $
         Set.fromList [Custom.custom, Custom.custom', Custom.customList']
           @=? Specification.collectTypes Custom.customSysSpec
+    ]
+
+constructorFrequenciesTests :: TestTree
+constructorFrequenciesTests =
+  testGroup
+    "Constructor frequency tests"
+    [ testCase "BinTree's constructor frequencies are collected correctly" $
+        Map.empty @=? Specification.constructorFrequencies BinTree.binTreeSysSpec,
+      testCase "Lambda's constructor frequencies are collected correctly" $
+        Map.fromList [("Data.Types.Lambda.Abs", 330)]
+          @=? Specification.constructorFrequencies Lambda.lambdaSysSpec,
+      testCase "Tree's constructor frequencies are collected correctly" $
+        Map.empty @=? Specification.constructorFrequencies Tree.treeSysSpec,
+      testCase "Custom's constructor frequencies are collected correctly" $
+        Map.fromList [("Data.Types.Custom.ConsA", 800), ("Data.Types.Custom.ConsB", 900)]
+          @=? Specification.constructorFrequencies Custom.customSysSpec
     ]
 
 getWeightTests :: TestTree
@@ -79,7 +95,7 @@ getFrequencyTests =
         Nothing @=? BinTree.binTreeSysSpec `Specification.getFrequency` show 'BinTree.Node,
       testCase "Lambda's constructor frequencies are computed correctly" $ do
         Nothing @=? Lambda.lambdaSysSpec `Specification.getFrequency` show 'Lambda.Index
-        Nothing @=? Lambda.lambdaSysSpec `Specification.getFrequency` show 'Lambda.Abs
+        Just 330 @=? Lambda.lambdaSysSpec `Specification.getFrequency` show 'Lambda.Abs
         Nothing @=? Lambda.lambdaSysSpec `Specification.getFrequency` show 'Lambda.App
         Nothing @=? Lambda.lambdaSysSpec `Specification.getFrequency` show 'Lambda.S
         Nothing @=? Lambda.lambdaSysSpec `Specification.getFrequency` show 'Lambda.Z,

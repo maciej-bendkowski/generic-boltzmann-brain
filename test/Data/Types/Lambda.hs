@@ -68,6 +68,8 @@ lambdaSysSpec =
                      (undefined :: Lambda)
                      ( withWeights
                          ['Index ==> 0]
+                         . withFrequencies
+                           ['Abs ==> 330]
                      )
                  ]
 
@@ -78,8 +80,6 @@ lambdaListSysSpec =
                      (undefined :: [Lambda])
                      ( withWeights
                          ['Index ==> 0]
-                         . withFrequencies
-                           ['Abs ==> 330]
                      )
                  ]
 
