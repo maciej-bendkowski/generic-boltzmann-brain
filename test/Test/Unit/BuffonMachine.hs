@@ -37,7 +37,10 @@ choiceTests =
         [(0, a), (1, b), (2, c)] <- choiceTest distributionC 1000000
         a `almostEqual` 0.14
         b `almostEqual` 0.57
-        c `almostEqual` 0.28
+        c `almostEqual` 0.28,
+      testCase "[1/1] is correctly sampled from" $ do
+        [(0, a)] <- choiceTest distributionD 1000000
+        a `almostEqual` 1.0
     ]
 
 -- [1/2, 1/2]
@@ -51,6 +54,9 @@ distributionB = fromList [2, 138, 4, 137, 6, 133, 8, 132, 10, 128, 12, 127, 14, 
 -- [1/7, 4/7, 2/7]
 distributionC :: Vector Int
 distributionC = fromList [2, 96, 4, 95, 6, 94, 8, 93, 10, 92, 12, 91, 14, 90, 16, 89, 18, 88, 20, 87, 22, 86, 24, 85, 26, 84, 28, 83, 30, 82, 32, 81, 34, 80, 36, 79, 38, 78, 40, 77, 42, 76, 44, 75, 46, 74, 48, 73, 50, 72, 52, 71, 54, 70, 56, 69, 58, 68, 60, 67, 62, 66, 64, 65, -3, -1, -2, -1, -3, -2, -1, -3, -2, -1, -3, -2, -1, -3, -2, -1, -3, -2, -1, -3, -2, -1, -3, -2, -1, -3, -2, -1, -3, -2, -1, -3, -2]
+
+distributionD :: Vector Int
+distributionD = fromList []
 
 choiceTest :: Vector Int -> Int -> IO [(Int, Double)]
 choiceTest dist n = runIO $ do
