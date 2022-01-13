@@ -6,9 +6,12 @@ module Test.Unit.Specification
 where
 
 import qualified Data.Boltzmann.Specification as Specification
+import qualified Data.Map as Map
 import qualified Data.Set as Set
+import Data.Types.BinTree (BinTree)
 import qualified Data.Types.BinTree as BinTree
 import qualified Data.Types.Custom as Custom
+import Data.Types.Lambda (Lambda)
 import qualified Data.Types.Lambda as Lambda
 import qualified Data.Types.Tree as Tree
 import Test.Tasty
@@ -24,7 +27,7 @@ unitTests :: TestTree
 unitTests =
   testGroup
     "Specification unit tests"
-    [collectTypesTests, getWeightTests, getFrequencyTests]
+    [typeSpecTests, collectTypesTests, getWeightTests, getFrequencyTests]
 
 collectTypesTests :: TestTree
 collectTypesTests =
@@ -89,3 +92,30 @@ getFrequencyTests =
         Just 900 @=? Custom.customSysSpec `Specification.getFrequency` show 'Custom.ConsB
         Nothing @=? Custom.customSysSpec `Specification.getFrequency` show 'Custom.ConsC
     ]
+
+typeSpecTests :: TestTree
+typeSpecTests =
+  testGroup
+    "TypeSpec unit tests"
+    [ testCase "Equal type specs are correctly identified" $ do
+        True @=? a == a
+        False @=? a == b,
+      testCase "Type specs are correctly ordered" $ do
+        True @=? a <= a
+        True @=? b <= a
+        False @=? a <= b
+    ]
+  where
+    a =
+      Specification.TypeSpec
+        { Specification.samplableType = undefined :: Lambda,
+          Specification.weight = Map.empty,
+          Specification.frequency = Map.empty
+        }
+
+    b =
+      Specification.TypeSpec
+        { Specification.samplableType = undefined :: BinTree,
+          Specification.weight = Map.empty,
+          Specification.frequency = Map.empty
+        }

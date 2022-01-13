@@ -16,6 +16,7 @@ import Data.Boltzmann.Specifiable
 import Data.Boltzmann.Specification
   ( SystemSpec,
     specification,
+    withFrequencies,
     withSystem,
     withWeights,
     (==>),
@@ -77,6 +78,8 @@ lambdaListSysSpec =
                      (undefined :: [Lambda])
                      ( withWeights
                          ['Index ==> 0]
+                         . withFrequencies
+                           ['Abs ==> 330]
                      )
                  ]
 

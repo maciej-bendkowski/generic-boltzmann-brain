@@ -9,9 +9,8 @@
 -- Maintainer  : maciej.bendkowski@gmail.com
 -- Stability   : experimental
 module Data.Boltzmann.Specification
-  ( TypeSpec,
+  ( TypeSpec (..),
     SystemSpec (..),
-    samplableType,
     defaultTypeSpec,
     withWeights,
     withFrequencies,
