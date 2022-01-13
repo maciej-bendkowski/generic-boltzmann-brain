@@ -12,8 +12,6 @@ module Data.Boltzmann.Specification
   ( TypeSpec,
     SystemSpec (..),
     samplableType,
-    weight,
-    frequency,
     defaultTypeSpec,
     withWeights,
     withFrequencies,
