@@ -10,11 +10,13 @@
 
 -- |
 -- Module      : Data.Boltzmann.Specifiable
--- Description :
+-- Description : Specifiable types.
 -- Copyright   : (c) Maciej Bendkowski, 2022
 -- License     : BSD3
 -- Maintainer  : maciej.bendkowski@gmail.com
 -- Stability   : experimental
+--
+-- Specifiable types, i.e. types which have corresponding (multiparametric) samplers.
 module Data.Boltzmann.Specifiable
   ( SpecifiableType (..),
     TypeDef,
@@ -39,16 +41,20 @@ import GHC.Generics
   )
 import Language.Haskell.TH.Syntax (Lift)
 
--- | Specifiable, algebraic type definitions given
+-- | Specifiable, algebraic type definition given
 --   as a list of respective type constructors.
 type TypeDef = [Cons]
 
+-- | Type constructors.
 data Cons = Cons
-  { name :: String,
+  { -- | Fully-qualified constructor name.
+    name :: String,
+    -- | List of (specifiable) arguments.
     args :: [SpecifiableType]
   }
   deriving (Eq, Show, Lift)
 
+-- | Specifiable types.
 data SpecifiableType
   = forall a. (Specifiable a) => SpecifiableType a
 
@@ -63,17 +69,23 @@ instance Ord SpecifiableType where
 
 instance Lift SpecifiableType
 
+-- | Generic types with type names.
 class GWithTypeName f where
+  -- | Fully qualified type name.
   gtypeName :: f a -> String
 
 instance (Datatype d) => GWithTypeName (D1 d f) where
   gtypeName x = moduleName x ++ "." ++ datatypeName x
 
+-- | Types which are specifiable, i.e. have corresponding
+--   (multiparametric) analytic samplers.
 class Specifiable a where
+  -- | Type definition corresponding to the specifiable type `a`.
   typedef :: a -> TypeDef
   default typedef :: (Generic a, GSpecifiable (Rep a)) => a -> TypeDef
   typedef = gtypedef . from
 
+  -- | Fully qualified type name.
   typeName :: a -> String
   default typeName :: (Generic a, GWithTypeName (Rep a)) => a -> String
   typeName = gtypeName . from
@@ -81,13 +93,15 @@ class Specifiable a where
 bracket :: String -> String
 bracket s = "[" ++ s ++ "]"
 
+-- | Given a specifiable type `a` computes the type name of lists of `a`.
 listTypeName :: Specifiable a => a -> String
 listTypeName = bracket . typeName
 
--- handle lists.
+-- Mechanically derived generic, specifiable types form specifiable lists.
 instance {-# OVERLAPS #-} (Generic a, Specifiable a) => Specifiable [a] where
   typeName _ = "[" ++ typeName (undefined :: a) ++ "]"
 
+-- | Generic types with type definitions.
 class GSpecifiable f where
   gtypedef :: f a -> TypeDef
 
@@ -108,6 +122,7 @@ instance (Constructor c, GConsArg f) => GSpecifiable' (C1 c f) where
     where
       qualifier = moduleName ++ "."
 
+-- | Generic constructor arguments.
 class GConsArg f where
   gargs :: f a -> [SpecifiableType]
 
