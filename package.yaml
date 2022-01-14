@@ -43,7 +43,7 @@ library:
   - -fwarn-missing-signatures
   - -ddump-splices
 
-executables:
+benchmarks:
   generic-boltzmann-brain-benchmark:
     main:        BinTreeBenchmark.hs
     source-dirs: benchmark
