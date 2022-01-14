@@ -38,6 +38,7 @@ packages:
 # forks / in-progress versions pinned to a git hash. For example:
 #
 extra-deps:
+- criterion-1.5.12.0
 - git: https://github.com/maciej-bendkowski/paganini-hs
   commit: 941e8f6314ea49b79c2cf1a03924cbedc981917e
 - git: https://github.com/OctopiChalmers/BinderAnn

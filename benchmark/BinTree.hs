@@ -2,15 +2,13 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Data.Types.BinTree where
+module BinTree where
 
+import Control.DeepSeq (NFData)
 import Data.Boltzmann.Sampler (BoltzmannSampler (..))
 import Data.Boltzmann.Sampler.Utils (mkSampler)
 import Data.Boltzmann.Specifiable
-  ( Cons (..),
-    Specifiable,
-    SpecifiableType (..),
-    TypeDef,
+  ( Specifiable,
   )
 import Data.Boltzmann.Specification
   ( SystemSpec,
@@ -20,25 +18,11 @@ import Data.Boltzmann.Specification
     (==>),
   )
 import GHC.Generics (Generic)
-import Test.Unit.Utils (Size (..))
 
 data BinTree
   = Leaf
   | Node BinTree BinTree
   deriving (Show, Generic, Specifiable)
-
-instance Size BinTree where
-  size Leaf = 0
-  size (Node ln rn) = 1 + size ln + size rn
-
-binTree :: SpecifiableType
-binTree = SpecifiableType (undefined :: BinTree)
-
-expectedTypeDef :: TypeDef
-expectedTypeDef =
-  [ Cons {name = "Data.Types.BinTree.Leaf", args = []},
-    Cons {name = "Data.Types.BinTree.Node", args = [binTree, binTree]}
-  ]
 
 binTreeSysSpec :: SystemSpec
 binTreeSysSpec =
@@ -51,3 +35,5 @@ binTreeSysSpec =
                  ]
 
 $(mkSampler ''BinTree)
+
+instance NFData BinTree
