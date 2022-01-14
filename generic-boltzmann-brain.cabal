@@ -6,7 +6,9 @@ cabal-version: 1.12
 
 name:           generic-boltzmann-brain
 version:        0.1.0.0
+synopsis:       Analytic sampler framework for algebraic data types
 description:    Please see the README on GitHub at <https://github.com/maciej-bendkowski/generic-boltzmann-brain#readme>
+category:       Data, Generic, Random
 homepage:       https://github.com/maciej-bendkowski/generic-boltzmann-brain#readme
 bug-reports:    https://github.com/maciej-bendkowski/generic-boltzmann-brain/issues
 author:         Maciej Bendkowski
