@@ -124,14 +124,14 @@ typeSpecTests =
   where
     a =
       Specification.TypeSpec
-        { Specification.samplableType = undefined :: Lambda,
+        { Specification.specifiableType = undefined :: Lambda,
           Specification.weight = Map.empty,
           Specification.frequency = Map.empty
         }
 
     b =
       Specification.TypeSpec
-        { Specification.samplableType = undefined :: BinTree,
+        { Specification.specifiableType = undefined :: BinTree,
           Specification.weight = Map.empty,
           Specification.frequency = Map.empty
         }

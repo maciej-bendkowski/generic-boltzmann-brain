@@ -1,14 +1,15 @@
-{-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 -- |
 -- Module      : Data.Boltzmann.Oracle
--- Description :
+-- Description : Sampler tuners and (Template Haskell) generators.
 -- Copyright   : (c) Maciej Bendkowski, 2022
 -- License     : BSD3
 -- Maintainer  : maciej.bendkowski@gmail.com
 -- Stability   : experimental
+--
+-- 
 module Data.Boltzmann.Oracle
   ( mkSpecSampler,
   )
@@ -24,6 +25,7 @@ import Data.Boltzmann.Specifiable
   )
 import Data.Boltzmann.Specification (getWeight)
 import qualified Data.Boltzmann.Specification as S
+import Data.BuffonMachine (DDG)
 import qualified Data.Map as Map
 import Data.Map.Strict (Map)
 import Data.Maybe (fromJust)
@@ -43,8 +45,7 @@ import Data.Paganini
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.Vector
-  ( Vector,
-    fromList,
+  ( fromList,
   )
 import Instances.TH.Lift ()
 import Language.Haskell.TH
@@ -65,10 +66,11 @@ import Language.Haskell.TH.Syntax
 sum' :: Num a => [a] -> a
 sum' = foldl1 (+)
 
+-- | Map from type names to generic Let variables.
 type VarDefs = Map String Let
 
--- Discrete distribution generating tree.
-type SystemDDGs = Map String (Vector Int)
+-- | Map from type names to discrete distribution generating trees.
+type SystemDDGs = Map String DDG
 
 mkVariables :: Set SpecifiableType -> Spec VarDefs
 mkVariables sys = do
@@ -100,36 +102,36 @@ data Params = Params
   }
 
 mkTypeVariables :: Params -> Set SpecifiableType -> Spec ()
-mkTypeVariables variables types =
-  mapM_ (mkTypeVariable variables) (Set.toList types)
+mkTypeVariables params types =
+  mapM_ (mkTypeVariable params) (Set.toList types)
 
 mkTypeVariable :: Params -> SpecifiableType -> Spec ()
-mkTypeVariable variables (SpecifiableType typ) = do
-  let (Let x) = typeVariable variables Map.! typeName typ
-  x .=. typeExpr variables (typedef typ)
+mkTypeVariable params (SpecifiableType typ) = do
+  let (Let x) = typeVariable params Map.! typeName typ
+  x .=. typeExpr params (typedef typ)
 
 typeExpr :: Params -> TypeDef -> Expr
-typeExpr variables = sum' . map (consExpr variables)
+typeExpr params = sum' . map (consExpr params)
 
 consExpr :: Params -> Cons -> Expr
-consExpr variables cons = defaults u * z ^ w * product args'
+consExpr params cons = defaults u * z ^ w * product args'
   where
-    z = sizeVar variables
-    u = name cons `Map.lookup` markingVariable variables
-    w = systemSpec variables `getWeight` name cons
-    args' = map (argExpr variables) (args cons)
+    z = sizeVar params
+    u = name cons `Map.lookup` markingVariable params
+    w = systemSpec params `getWeight` name cons
+    args' = map (argExpr params) (args cons)
 
 argExpr :: Params -> SpecifiableType -> Expr
-argExpr variables (SpecifiableType typ) =
-  let Let x = typeVariable variables Map.! typeName typ in x
+argExpr params (SpecifiableType typ) =
+  let Let x = typeVariable params Map.! typeName typ in x
 
 defaults :: (Num p, FromVariable p) => Maybe Let -> p
 defaults Nothing = 1
 defaults (Just (Let x)) = x
 
 mkDDGs :: Params -> Spec SystemDDGs
-mkDDGs variables = do
-  let typeList = Map.toList $ typeVariable variables
+mkDDGs params = do
+  let typeList = Map.toList $ typeVariable params
   ddgs <-
     mapM
       ( \(n, x) -> do
@@ -145,13 +147,13 @@ paganiniSpecIO = debugPaganini . paganiniSpec
 
 paganiniSpec :: S.SystemSpec -> Spec SystemDDGs
 paganiniSpec sys@(S.SystemSpec {S.targetType = target, S.meanSize = n}) = do
-  let samplableTypes = S.collectTypes sys
+  let specifiableTypes = S.collectTypes sys
 
   Let z <- variable' n
-  varDefs <- mkVariables samplableTypes
+  varDefs <- mkVariables specifiableTypes
   markDefs <- mkMarkingVariables sys
 
-  let variables =
+  let params =
         Params
           { sizeVar = z,
             typeVariable = varDefs,
@@ -159,11 +161,11 @@ paganiniSpec sys@(S.SystemSpec {S.targetType = target, S.meanSize = n}) = do
             systemSpec = sys
           }
 
-  mkTypeVariables variables samplableTypes
+  mkTypeVariables params specifiableTypes
   let (Let t) = varDefs Map.! typeName target
 
   tune t -- tune for target variable.
-  mkDDGs variables
+  mkDDGs params
 
 systemDDGs :: S.SystemSpec -> IO SystemDDGs
 systemDDGs sys = do
@@ -178,7 +180,7 @@ mkChoiceFun sys = do
   matches <- mapM mkChoiceFun' $ Map.toList ddgs
   return $ LamCaseE matches
 
-mkChoiceFun' :: (String, Vector Int) -> Q Match
+mkChoiceFun' :: (String, DDG) -> Q Match
 mkChoiceFun' (s, ddg) = do
   listExpr <- [|ddg|]
   return $ Match (LitP (StringL s)) (NormalB listExpr) []
@@ -199,5 +201,10 @@ mkWeightMatch sys cons = return $ Match (LitP (StringL s)) (NormalB $ LitE (Inte
     s = name cons
     w = sys `S.getWeight` s
 
+-- | Given a system specification:
+--
+--   * tunes the specification using the external `paganini` library, and
+--   * uses so obtained constructor probability distributions to generate,
+--   at compile-time, a dedicated analytic sampler.
 mkSpecSampler :: S.SystemSpec -> Q Exp
 mkSpecSampler sys = [|sample $(mkChoiceFun sys) $(mkWeightFun sys)|]

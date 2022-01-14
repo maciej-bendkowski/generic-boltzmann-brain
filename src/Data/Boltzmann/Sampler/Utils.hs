@@ -5,7 +5,7 @@
 
 -- |
 -- Module      : Data.Boltzmann.Oracle
--- Description :
+-- Description : Template Haskell utilities for sampler generation.
 -- Copyright   : (c) Maciej Bendkowski, 2022
 -- License     : BSD3
 -- Maintainer  : maciej.bendkowski@gmail.com
@@ -24,7 +24,20 @@ import Language.Haskell.TH.Datatype
     constructorName,
     reifyDatatype,
   )
-import Language.Haskell.TH.Syntax (Body (NormalB), Clause (Clause), Dec (FunD, InstanceD), Exp (AppE, ConE, InfixE, LamE, LitE, VarE), Lit (IntegerL, StringL), Match (Match), Name, Pat (LitP, TupP), Q, Stmt (BindS), Type (AppT, ConT), mkName)
+import Language.Haskell.TH.Syntax
+  ( Body (NormalB),
+    Clause (Clause),
+    Dec (FunD, InstanceD),
+    Exp (AppE, ConE, InfixE, LamE, LitE, VarE),
+    Lit (IntegerL, StringL),
+    Match (Match),
+    Name,
+    Pat (LitP, TupP),
+    Q,
+    Stmt (BindS),
+    Type (AppT, ConT),
+    mkName,
+  )
 import Prelude hiding (sum)
 
 application :: Exp -> Exp -> [Exp] -> Exp
@@ -164,6 +177,7 @@ genConstrGroup typ = do
   let consInfo = datatypeCons typInfo
   return $ zip consInfo [0 :: Integer ..]
 
+-- | Given a type name `a`, instantiates it as `BoltzmannSampler` of `a`.
 mkSampler :: Name -> Q [Dec]
 mkSampler typ = do
   samplerBody <- gen typ
