@@ -17,10 +17,10 @@ unitTests =
 
 sampleSizeTests :: [TestTree]
 sampleSizeTests =
-  [ testProperty "Lambda sampler respects size constraints for sizes around the mean of 1,000" lambdaSamplerSizeProp,
-    testProperty "BinTree sampler respects size constraints for sizes around the mean of 1,000" binTreeSamplerSizeProp,
-    testProperty "Tree sampler respects size constraints for sizes around the mean of 1,000" treeSamplerSizeProp,
-    testProperty "Lambda list sampler respects size constraints for sizes around the mean of 1,000" lambdaListSamplerSizeProp
+  [ testProperty "Lambda sampler respects size constraints for sizes around the mean of 1,000" lambdaSamplerSizeProp
+  , testProperty "BinTree sampler respects size constraints for sizes around the mean of 1,000" binTreeSamplerSizeProp
+  , testProperty "Tree sampler respects size constraints for sizes around the mean of 1,000" treeSamplerSizeProp
+  , testProperty "Lambda list sampler respects size constraints for sizes around the mean of 1,000" lambdaListSamplerSizeProp
   ]
 
 lambdaSamplerSizeProp :: Positive Int -> Property

@@ -12,15 +12,14 @@
 -- License     : BSD3
 -- Maintainer  : maciej.bendkowski@gmail.com
 -- Stability   : experimental
-module Data.Boltzmann.Sampler
-  ( RejectionSampler,
-    DDGSelector,
-    WeightSelector,
-    BoltzmannSampler (..),
-    rejectionSampler,
-    rejectionSamplerIO,
-  )
-where
+module Data.Boltzmann.Sampler (
+  RejectionSampler,
+  DDGSelector,
+  WeightSelector,
+  BoltzmannSampler (..),
+  rejectionSampler,
+  rejectionSamplerIO,
+) where
 
 import Control.Monad (guard)
 import Control.Monad.Trans (MonadTrans (lift))

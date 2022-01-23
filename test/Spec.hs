@@ -12,8 +12,8 @@ tests = testGroup "Unit tests" unitTests
 
 unitTests :: [TestTree]
 unitTests =
-  [ Specifiable.unitTests,
-    Specification.unitTests,
-    BuffonMachine.unitTests,
-    Sampler.unitTests
+  [ Specifiable.unitTests
+  , Specification.unitTests
+  , BuffonMachine.unitTests
+  , Sampler.unitTests
   ]

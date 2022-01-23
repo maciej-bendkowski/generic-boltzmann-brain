@@ -17,28 +17,27 @@
 -- Stability   : experimental
 --
 -- Specifiable types, i.e. types which have corresponding (multiparametric) samplers.
-module Data.Boltzmann.Specifiable
-  ( SpecifiableType (..),
-    TypeDef,
-    Cons (..),
-    Specifiable (..),
-    listTypeName,
-  )
-where
+module Data.Boltzmann.Specifiable (
+  SpecifiableType (..),
+  TypeDef,
+  Cons (..),
+  Specifiable (..),
+  listTypeName,
+) where
 
-import GHC.Generics
-  ( C1,
-    Constructor (conName),
-    D1,
-    Datatype (datatypeName, moduleName),
-    Generic (Rep, from),
-    K1,
-    R,
-    S1,
-    U1,
-    type (:*:),
-    type (:+:),
-  )
+import GHC.Generics (
+  C1,
+  Constructor (conName),
+  D1,
+  Datatype (datatypeName, moduleName),
+  Generic (Rep, from),
+  K1,
+  R,
+  S1,
+  U1,
+  type (:*:),
+  type (:+:),
+ )
 import Language.Haskell.TH.Syntax (Lift)
 
 -- | Specifiable, algebraic type definition given
@@ -48,8 +47,8 @@ type TypeDef = [Cons]
 -- | Type constructors.
 data Cons = Cons
   { -- | Fully-qualified constructor name.
-    name :: String,
-    -- | List of (specifiable) arguments.
+    name :: String
+  , -- | List of (specifiable) arguments.
     args :: [SpecifiableType]
   }
   deriving (Eq, Show, Lift)

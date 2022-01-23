@@ -7,20 +7,20 @@ module Data.Types.Lambda where
 
 import Data.Boltzmann.Sampler (BoltzmannSampler (..))
 import Data.Boltzmann.Sampler.Utils (mkSampler)
-import Data.Boltzmann.Specifiable
-  ( Cons (..),
-    Specifiable,
-    SpecifiableType (..),
-    TypeDef,
-  )
-import Data.Boltzmann.Specification
-  ( SystemSpec,
-    specification,
-    withFrequencies,
-    withSystem,
-    withWeights,
-    (==>),
-  )
+import Data.Boltzmann.Specifiable (
+  Cons (..),
+  Specifiable,
+  SpecifiableType (..),
+  TypeDef,
+ )
+import Data.Boltzmann.Specification (
+  SystemSpec,
+  specification,
+  withFrequencies,
+  withSystem,
+  withWeights,
+  (==>),
+ )
 import GHC.Generics (Generic)
 import Test.Unit.Utils (Size (..))
 
@@ -50,37 +50,37 @@ lambda = SpecifiableType (undefined :: Lambda)
 
 expectedDeBruijnTypeDef :: TypeDef
 expectedDeBruijnTypeDef =
-  [ Cons {name = "Data.Types.Lambda.S", args = [deBruijn]},
-    Cons {name = "Data.Types.Lambda.Z", args = []}
+  [ Cons {name = "Data.Types.Lambda.S", args = [deBruijn]}
+  , Cons {name = "Data.Types.Lambda.Z", args = []}
   ]
 
 expectedLambdaTypeDef :: TypeDef
 expectedLambdaTypeDef =
-  [ Cons {name = "Data.Types.Lambda.Abs", args = [lambda]},
-    Cons {name = "Data.Types.Lambda.App", args = [lambda, lambda]},
-    Cons {name = "Data.Types.Lambda.Index", args = [deBruijn]}
+  [ Cons {name = "Data.Types.Lambda.Abs", args = [lambda]}
+  , Cons {name = "Data.Types.Lambda.App", args = [lambda, lambda]}
+  , Cons {name = "Data.Types.Lambda.Index", args = [deBruijn]}
   ]
 
 lambdaSysSpec :: SystemSpec
 lambdaSysSpec =
   (undefined :: Lambda, 1000)
     `withSystem` [ specification
-                     (undefined :: Lambda)
-                     ( withWeights
-                         ['Index ==> 0]
-                         . withFrequencies
-                           ['Abs ==> 330]
-                     )
+                    (undefined :: Lambda)
+                    ( withWeights
+                        ['Index ==> 0]
+                        . withFrequencies
+                          ['Abs ==> 330]
+                    )
                  ]
 
 lambdaListSysSpec :: SystemSpec
 lambdaListSysSpec =
   (undefined :: [Lambda], 1000)
     `withSystem` [ specification
-                     (undefined :: [Lambda])
-                     ( withWeights
-                         ['Index ==> 0]
-                     )
+                    (undefined :: [Lambda])
+                    ( withWeights
+                        ['Index ==> 0]
+                    )
                  ]
 
 $(mkSampler ''DeBruijn)

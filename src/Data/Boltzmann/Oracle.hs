@@ -8,59 +8,56 @@
 -- License     : BSD3
 -- Maintainer  : maciej.bendkowski@gmail.com
 -- Stability   : experimental
---
--- 
-module Data.Boltzmann.Oracle
-  ( mkSpecSampler,
-  )
-where
+module Data.Boltzmann.Oracle (
+  mkSpecSampler,
+) where
 
 import Control.Monad (replicateM)
 import Data.Boltzmann.Sampler (BoltzmannSampler (sample))
-import Data.Boltzmann.Specifiable
-  ( Cons (args, name),
-    Specifiable (..),
-    SpecifiableType (..),
-    TypeDef,
-  )
+import Data.Boltzmann.Specifiable (
+  Cons (args, name),
+  Specifiable (..),
+  SpecifiableType (..),
+  TypeDef,
+ )
 import Data.Boltzmann.Specification (getWeight)
 import qualified Data.Boltzmann.Specification as S
 import Data.BuffonMachine (DDG)
 import qualified Data.Map as Map
 import Data.Map.Strict (Map)
 import Data.Maybe (fromJust)
-import Data.Paganini
-  ( Expr,
-    FromVariable,
-    Let (Let),
-    PaganiniError,
-    Spec,
-    ddg,
-    debugPaganini,
-    tune,
-    variable,
-    variable',
-    (.=.),
-  )
+import Data.Paganini (
+  Expr,
+  FromVariable,
+  Let (Let),
+  PaganiniError,
+  Spec,
+  ddg,
+  debugPaganini,
+  tune,
+  variable,
+  variable',
+  (.=.),
+ )
 import Data.Set (Set)
 import qualified Data.Set as Set
-import Data.Vector
-  ( fromList,
-  )
+import Data.Vector (
+  fromList,
+ )
 import Instances.TH.Lift ()
-import Language.Haskell.TH
-  ( Exp (LamCaseE),
-    Lit (IntegerL),
-    runIO,
-  )
-import Language.Haskell.TH.Syntax
-  ( Body (NormalB),
-    Exp (LitE),
-    Lit (StringL),
-    Match (Match),
-    Pat (LitP),
-    Q,
-  )
+import Language.Haskell.TH (
+  Exp (LamCaseE),
+  Lit (IntegerL),
+  runIO,
+ )
+import Language.Haskell.TH.Syntax (
+  Body (NormalB),
+  Exp (LitE),
+  Lit (StringL),
+  Match (Match),
+  Pat (LitP),
+  Q,
+ )
 
 -- nicer sum for non-empty lists.
 sum' :: Num a => [a] -> a
@@ -95,10 +92,10 @@ mkMarkingVariables sys = do
   return $ Map.fromList xs
 
 data Params = Params
-  { sizeVar :: forall a. FromVariable a => a,
-    typeVariable :: Map String Let,
-    markingVariable :: Map String Let,
-    systemSpec :: S.SystemSpec
+  { sizeVar :: forall a. FromVariable a => a
+  , typeVariable :: Map String Let
+  , markingVariable :: Map String Let
+  , systemSpec :: S.SystemSpec
   }
 
 mkTypeVariables :: Params -> Set SpecifiableType -> Spec ()
@@ -155,10 +152,10 @@ paganiniSpec sys@(S.SystemSpec {S.targetType = target, S.meanSize = n}) = do
 
   let params =
         Params
-          { sizeVar = z,
-            typeVariable = varDefs,
-            markingVariable = markDefs,
-            systemSpec = sys
+          { sizeVar = z
+          , typeVariable = varDefs
+          , markingVariable = markDefs
+          , systemSpec = sys
           }
 
   mkTypeVariables params specifiableTypes

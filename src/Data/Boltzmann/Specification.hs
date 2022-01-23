@@ -8,30 +8,29 @@
 -- License     : BSD3
 -- Maintainer  : maciej.bendkowski@gmail.com
 -- Stability   : experimental
-module Data.Boltzmann.Specification
-  ( TypeSpec (..),
-    SystemSpec (..),
-    defaultTypeSpec,
-    withWeights,
-    withFrequencies,
-    specification,
-    withSystem,
-    (==>),
-    collectTypes,
-    ConsFreq,
-    Value,
-    constructorFrequencies,
-    getWeight,
-    getFrequency,
-  )
-where
+module Data.Boltzmann.Specification (
+  TypeSpec (..),
+  SystemSpec (..),
+  defaultTypeSpec,
+  withWeights,
+  withFrequencies,
+  specification,
+  withSystem,
+  (==>),
+  collectTypes,
+  ConsFreq,
+  Value,
+  constructorFrequencies,
+  getWeight,
+  getFrequency,
+) where
 
 import Data.Bifunctor (Bifunctor (first))
-import Data.Boltzmann.Specifiable
-  ( Cons (args),
-    Specifiable (..),
-    SpecifiableType (..),
-  )
+import Data.Boltzmann.Specifiable (
+  Cons (args),
+  Specifiable (..),
+  SpecifiableType (..),
+ )
 import qualified Data.Map as Map
 import Data.Map.Strict (Map)
 import Data.Maybe (fromJust)
@@ -44,11 +43,11 @@ data TypeSpec = forall a.
   Specifiable a =>
   TypeSpec
   { -- | Corresponding specifiable type `a`.
-    specifiableType :: a,
-    -- | Constructors of `a` mapped to their (custom) weight. If no custom
+    specifiableType :: a
+  , -- | Constructors of `a` mapped to their (custom) weight. If no custom
     --  weight is provided, a default one of 1 is assumed.
-    weight :: Map String Integer,
-    -- | Constructors of `a` mapped to their (custom) frequencies. If no custom
+    weight :: Map String Integer
+  , -- | Constructors of `a` mapped to their (custom) frequencies. If no custom
     --  frequency is provided, no frequency is assumed.
     frequency :: Map String Integer
   }
@@ -66,10 +65,10 @@ data SystemSpec = forall a.
   Specifiable a =>
   SystemSpec
   { -- | Specifiable which is designated as the "target" tuning type.
-    targetType :: a,
-    -- | Target mean size of the objects corresponding to the tuned system.
-    meanSize :: Integer,
-    -- | Set of interdependent, specifiable types.
+    targetType :: a
+  , -- | Target mean size of the objects corresponding to the tuned system.
+    meanSize :: Integer
+  , -- | Set of interdependent, specifiable types.
     typeSpecs :: Set TypeSpec
   }
 
@@ -109,13 +108,13 @@ getFrequency' name spec = name `Map.lookup` frequency spec
 defaultTypeSpec :: Specifiable a => a -> TypeSpec
 defaultTypeSpec typ =
   TypeSpec
-    { specifiableType = typ,
-      weight =
+    { specifiableType = typ
+    , weight =
         Map.fromList
-          [ (show '[], 0),
-            (show '(:), 0)
-          ],
-      frequency = Map.empty
+          [ (show '[], 0)
+          , (show '(:), 0)
+          ]
+    , frequency = Map.empty
     }
 
 -- | Constructor names with associated numeric values (for either weights or frequencies).
@@ -154,9 +153,9 @@ withSystem ::
   SystemSpec
 withSystem (typ, size) specs =
   SystemSpec
-    { targetType = typ,
-      meanSize = size,
-      typeSpecs = Set.fromList specs
+    { targetType = typ
+    , meanSize = size
+    , typeSpecs = Set.fromList specs
     }
 
 toSpecifiableTypes :: SystemSpec -> Set SpecifiableType

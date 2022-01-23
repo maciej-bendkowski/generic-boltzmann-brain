@@ -4,18 +4,18 @@
 
 module Data.Types.Custom where
 
-import Data.Boltzmann.Specifiable
-  ( Specifiable,
-    SpecifiableType (..),
-  )
-import Data.Boltzmann.Specification
-  ( SystemSpec,
-    specification,
-    withFrequencies,
-    withSystem,
-    withWeights,
-    (==>),
-  )
+import Data.Boltzmann.Specifiable (
+  Specifiable,
+  SpecifiableType (..),
+ )
+import Data.Boltzmann.Specification (
+  SystemSpec,
+  specification,
+  withFrequencies,
+  withSystem,
+  withWeights,
+  (==>),
+ )
 import GHC.Generics (Generic)
 import Test.Unit.Utils (Size (..))
 
@@ -48,15 +48,15 @@ customSysSpec :: SystemSpec
 customSysSpec =
   (undefined :: Custom, 10000)
     `withSystem` [ specification
-                     (undefined :: Custom)
-                     ( withWeights
-                         [ 'ConsA ==> 2,
-                           'ConsB ==> 3,
-                           'ConsC ==> 4
-                         ]
-                         . withFrequencies
-                           [ 'ConsA ==> 800,
-                             'ConsB ==> 900
-                           ]
-                     )
+                    (undefined :: Custom)
+                    ( withWeights
+                        [ 'ConsA ==> 2
+                        , 'ConsB ==> 3
+                        , 'ConsC ==> 4
+                        ]
+                        . withFrequencies
+                          [ 'ConsA ==> 800
+                          , 'ConsB ==> 900
+                          ]
+                    )
                  ]

@@ -17,27 +17,27 @@ import qualified Control.Monad.Trans as T
 import Data.Boltzmann.Sampler (sample)
 import Data.BuffonMachine (choice)
 import Language.Haskell.TH (Exp (DoE, LamCaseE, TupE), Pat (VarP), Stmt (NoBindS), newName)
-import Language.Haskell.TH.Datatype
-  ( ConstructorInfo (constructorName),
-    DatatypeInfo (..),
-    constructorFields,
-    constructorName,
-    reifyDatatype,
-  )
-import Language.Haskell.TH.Syntax
-  ( Body (NormalB),
-    Clause (Clause),
-    Dec (FunD, InstanceD),
-    Exp (AppE, ConE, InfixE, LamE, LitE, VarE),
-    Lit (IntegerL, StringL),
-    Match (Match),
-    Name,
-    Pat (LitP, TupP),
-    Q,
-    Stmt (BindS),
-    Type (AppT, ConT),
-    mkName,
-  )
+import Language.Haskell.TH.Datatype (
+  ConstructorInfo (constructorName),
+  DatatypeInfo (..),
+  constructorFields,
+  constructorName,
+  reifyDatatype,
+ )
+import Language.Haskell.TH.Syntax (
+  Body (NormalB),
+  Clause (Clause),
+  Dec (FunD, InstanceD),
+  Exp (AppE, ConE, InfixE, LamE, LitE, VarE),
+  Lit (IntegerL, StringL),
+  Match (Match),
+  Name,
+  Pat (LitP, TupP),
+  Q,
+  Stmt (BindS),
+  Type (AppT, ConT),
+  mkName,
+ )
 import Prelude hiding (sum)
 
 application :: Exp -> Exp -> [Exp] -> Exp
@@ -108,9 +108,9 @@ genConstrApplication s args' = do
   return $ foldl AppE con args'
 
 data ArgStmtExpr = ArgStmtExpr
-  { stmts :: [Stmt],
-    objs :: [Exp],
-    weights :: [Exp]
+  { stmts :: [Stmt]
+  , objs :: [Exp]
+  , weights :: [Exp]
   }
 
 genArgExprs :: ConstructorInfo -> Q ArgStmtExpr
@@ -130,9 +130,9 @@ genArgExprs' ubExpr (_ : as) = do
   let stmt = BindS (TupP [xp, wp]) (AppE (AppE (AppE argExpr (VarE $ mkName "ddgs")) (VarE $ mkName "weight")) ubExpr)
   return
     ArgStmtExpr
-      { stmts = stmt : stmts argStmtExpr,
-        objs = x : objs argStmtExpr,
-        weights = w : weights argStmtExpr
+      { stmts = stmt : stmts argStmtExpr
+      , objs = x : objs argStmtExpr
+      , weights = w : weights argStmtExpr
       }
 
 genChoiceExpr :: Name -> Q Exp
@@ -167,8 +167,8 @@ gen typ = do
       [pat "ddgs", pat "weight", pat "ub"]
       $ DoE
         Nothing
-        [ NoBindS guardExpr,
-          NoBindS $ InfixE (Just choiceExpr) bindOp (Just caseExpr)
+        [ NoBindS guardExpr
+        , NoBindS $ InfixE (Just choiceExpr) bindOp (Just caseExpr)
         ]
 
 genConstrGroup :: Name -> Q [(ConstructorInfo, Integer)]

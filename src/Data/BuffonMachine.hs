@@ -15,24 +15,23 @@
 -- * J. Lumbroso : "Optimal Discrete Uniform Generation from Coin Flips, and Applications".
 -- * F. A. Saad, C. E. Freer, M. C. Rinard, V.K. Mansinghka "Optimal Approximate
 --     Sampling from Discrete Probability Distributions", POPL'20 (2020).
-module Data.BuffonMachine
-  ( BuffonMachine,
-    Discrete,
-    Oracle (..),
-    DDG,
-    choice,
-    run,
-    runIO,
-  )
-where
+module Data.BuffonMachine (
+  BuffonMachine,
+  Discrete,
+  Oracle (..),
+  DDG,
+  choice,
+  run,
+  runIO,
+) where
 
-import Control.Monad.Trans.State.Strict
-  ( State,
-    evalState,
-    get,
-    modify',
-    put,
-  )
+import Control.Monad.Trans.State.Strict (
+  State,
+  evalState,
+  get,
+  modify',
+  put,
+ )
 import Data.Bits (Bits (testBit))
 import Data.Vector (Vector, null, (!))
 import Data.Word (Word32)
@@ -42,10 +41,10 @@ import Prelude hiding (null)
 -- | Buffered random bit oracle.
 data Oracle g = Oracle
   { -- | 32-bit buffer of random bits.
-    buffer :: !Word32,
-    -- | Number of bits consumed from the current buffer.
-    usedBits :: !Int,
-    -- | Random number generator used to obtain random bits.
+    buffer :: !Word32
+  , -- | Number of bits consumed from the current buffer.
+    usedBits :: !Int
+  , -- | Random number generator used to obtain random bits.
     rng :: g
   }
 

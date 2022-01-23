@@ -6,19 +6,19 @@ module Data.Types.BinTree where
 
 import Data.Boltzmann.Sampler (BoltzmannSampler (..))
 import Data.Boltzmann.Sampler.Utils (mkSampler)
-import Data.Boltzmann.Specifiable
-  ( Cons (..),
-    Specifiable,
-    SpecifiableType (..),
-    TypeDef,
-  )
-import Data.Boltzmann.Specification
-  ( SystemSpec,
-    specification,
-    withSystem,
-    withWeights,
-    (==>),
-  )
+import Data.Boltzmann.Specifiable (
+  Cons (..),
+  Specifiable,
+  SpecifiableType (..),
+  TypeDef,
+ )
+import Data.Boltzmann.Specification (
+  SystemSpec,
+  specification,
+  withSystem,
+  withWeights,
+  (==>),
+ )
 import GHC.Generics (Generic)
 import Test.Unit.Utils (Size (..))
 
@@ -36,18 +36,18 @@ binTree = SpecifiableType (undefined :: BinTree)
 
 expectedTypeDef :: TypeDef
 expectedTypeDef =
-  [ Cons {name = "Data.Types.BinTree.Leaf", args = []},
-    Cons {name = "Data.Types.BinTree.Node", args = [binTree, binTree]}
+  [ Cons {name = "Data.Types.BinTree.Leaf", args = []}
+  , Cons {name = "Data.Types.BinTree.Node", args = [binTree, binTree]}
   ]
 
 binTreeSysSpec :: SystemSpec
 binTreeSysSpec =
   (undefined :: BinTree, 4000)
     `withSystem` [ specification
-                     (undefined :: BinTree)
-                     ( withWeights
-                         ['Leaf ==> 0]
-                     )
+                    (undefined :: BinTree)
+                    ( withWeights
+                        ['Leaf ==> 0]
+                    )
                  ]
 
 $(mkSampler ''BinTree)

@@ -4,15 +4,15 @@ import Control.Monad (replicateM)
 import Data.BuffonMachine (choice, runIO)
 import qualified Data.Map as Map
 import Data.Vector (Vector, fromList)
-import Test.Tasty
-  ( TestTree,
-    testGroup,
-  )
-import Test.Tasty.HUnit
-  ( Assertion,
-    assertBool,
-    testCase,
-  )
+import Test.Tasty (
+  TestTree,
+  testGroup,
+ )
+import Test.Tasty.HUnit (
+  Assertion,
+  assertBool,
+  testCase,
+ )
 
 unitTests :: TestTree
 unitTests =
@@ -27,18 +27,18 @@ choiceTests =
     [ testCase "[1/2, 1/2] is correctly sampled from" $ do
         [(0, a), (1, b)] <- choiceTest distributionA 1000000
         a `almostEqual` 0.5
-        b `almostEqual` 0.5,
-      testCase "[1/3, 1/3, 1/3] is correctly sampled from" $ do
+        b `almostEqual` 0.5
+    , testCase "[1/3, 1/3, 1/3] is correctly sampled from" $ do
         [(0, a), (1, b), (2, c)] <- choiceTest distributionB 1000000
         a `almostEqual` 0.33
         b `almostEqual` 0.33
-        c `almostEqual` 0.33,
-      testCase "[1/7, 4/7, 2/7] is correctly sampled from" $ do
+        c `almostEqual` 0.33
+    , testCase "[1/7, 4/7, 2/7] is correctly sampled from" $ do
         [(0, a), (1, b), (2, c)] <- choiceTest distributionC 1000000
         a `almostEqual` 0.14
         b `almostEqual` 0.57
-        c `almostEqual` 0.28,
-      testCase "[1/1] is correctly sampled from" $ do
+        c `almostEqual` 0.28
+    , testCase "[1/1] is correctly sampled from" $ do
         [(0, a)] <- choiceTest distributionD 1000000
         a `almostEqual` 1.0
     ]
