@@ -88,7 +88,7 @@ test-suite generic-boltzmann-brain-test
     , vector >=0.12.3.1
   default-language: Haskell2010
 
-benchmark generic-boltzmann-brain-benchmark
+benchmark binTree
   type: exitcode-stdio-1.0
   main-is: BinTreeBenchmark.hs
   other-modules:
@@ -96,7 +96,7 @@ benchmark generic-boltzmann-brain-benchmark
       BinTreeSampler
       Paths_generic_boltzmann_brain
   hs-source-dirs:
-      benchmark
+      benchmark/BinTree
   ghc-options: -O2 -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -Wno-name-shadowing -fwarn-missing-signatures -ddump-splices
   build-depends:
       base >=4.7 && <5

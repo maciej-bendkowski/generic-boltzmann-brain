@@ -44,9 +44,9 @@ library:
   - -ddump-splices
 
 benchmarks:
-  generic-boltzmann-brain-benchmark:
+  binTree:
     main:        BinTreeBenchmark.hs
-    source-dirs: benchmark
+    source-dirs: benchmark/BinTree
     ghc-options:
     - -O2
     - -Wall
