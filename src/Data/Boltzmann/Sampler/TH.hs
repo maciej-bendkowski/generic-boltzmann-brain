@@ -4,13 +4,13 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 -- |
--- Module      : Data.Boltzmann.Oracle
+-- Module      : Data.Boltzmann.Sampler.TH
 -- Description : Template Haskell utilities for sampler generation.
 -- Copyright   : (c) Maciej Bendkowski, 2022
 -- License     : BSD3
 -- Maintainer  : maciej.bendkowski@gmail.com
 -- Stability   : experimental
-module Data.Boltzmann.Sampler.Utils (mkSampler) where
+module Data.Boltzmann.Sampler.TH (mkSampler) where
 
 import Control.Monad (guard)
 import qualified Control.Monad.Trans as T

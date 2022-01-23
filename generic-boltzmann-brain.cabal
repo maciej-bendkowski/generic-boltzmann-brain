@@ -28,7 +28,7 @@ library
   exposed-modules:
       Data.Boltzmann.Oracle
       Data.Boltzmann.Sampler
-      Data.Boltzmann.Sampler.Utils
+      Data.Boltzmann.Sampler.TH
       Data.Boltzmann.Specifiable
       Data.Boltzmann.Specification
       Data.BuffonMachine

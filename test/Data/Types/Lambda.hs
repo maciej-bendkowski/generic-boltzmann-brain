@@ -6,7 +6,7 @@
 module Data.Types.Lambda where
 
 import Data.Boltzmann.Sampler (BoltzmannSampler (..))
-import Data.Boltzmann.Sampler.Utils (mkSampler)
+import Data.Boltzmann.Sampler.TH (mkSampler)
 import Data.Boltzmann.Specifiable (
   Cons (..),
   Specifiable,

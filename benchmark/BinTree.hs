@@ -6,7 +6,7 @@ module BinTree where
 
 import Control.DeepSeq (NFData)
 import Data.Boltzmann.Sampler (BoltzmannSampler (..))
-import Data.Boltzmann.Sampler.Utils (mkSampler)
+import Data.Boltzmann.Sampler.TH (mkSampler)
 import Data.Boltzmann.Specifiable (
   Specifiable,
  )

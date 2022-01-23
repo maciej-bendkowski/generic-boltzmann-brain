@@ -5,7 +5,7 @@
 module Data.Types.BinTree where
 
 import Data.Boltzmann.Sampler (BoltzmannSampler (..))
-import Data.Boltzmann.Sampler.Utils (mkSampler)
+import Data.Boltzmann.Sampler.TH (mkSampler)
 import Data.Boltzmann.Specifiable (
   Cons (..),
   Specifiable,
