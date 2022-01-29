@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE NumericUnderscores #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module BinTree where
@@ -26,7 +27,17 @@ data BinTree
 
 binTreeSysSpec :: SystemSpec
 binTreeSysSpec =
-  (undefined :: BinTree, 4000)
+  (undefined :: BinTree, 1_000)
+    `withSystem` [ specification
+                    (undefined :: BinTree)
+                    ( withWeights
+                        ['Leaf ==> 0]
+                    )
+                 ]
+
+mediumBinTreeSysSpec :: SystemSpec
+mediumBinTreeSysSpec =
+  (undefined :: BinTree, 10_000)
     `withSystem` [ specification
                     (undefined :: BinTree)
                     ( withWeights
