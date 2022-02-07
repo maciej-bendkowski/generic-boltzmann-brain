@@ -43,6 +43,23 @@ library:
   - -fwarn-missing-signatures
   - -ddump-splices
 
+executables:
+  binTreeProfile:
+    main:        BinTreeProfile.hs
+    source-dirs: profile/BinTree
+    ghc-options:
+    - -O2
+    - -Wall
+    - -Wcompat
+    - -Wincomplete-record-updates
+    - -Wincomplete-uni-patterns
+    - -Wredundant-constraints
+    - -Wno-name-shadowing
+    - -fwarn-missing-signatures
+    - -ddump-splices
+    dependencies:
+    - generic-boltzmann-brain
+
 benchmarks:
   binTree:
     main:        BinTreeBenchmark.hs
