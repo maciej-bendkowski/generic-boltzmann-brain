@@ -26,13 +26,10 @@ source-repository head
 
 library
   exposed-modules:
-      Data.Boltzmann.Oracle
       Data.Boltzmann.Samplable
       Data.Boltzmann.Samplable.TH
       Data.Boltzmann.Sampler
       Data.Boltzmann.Sampler.TH
-      Data.Boltzmann.Specifiable
-      Data.Boltzmann.Specification
       Data.Boltzmann.System
       Data.Boltzmann.Weighed
       Data.Boltzmann.Weighed.TH

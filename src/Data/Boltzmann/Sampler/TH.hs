@@ -43,7 +43,7 @@ import Language.Haskell.TH.Syntax (
   Pat (LitP, TupP),
   Q,
   Stmt (BindS),
-  Type (AppT, ConT, VarT),
+  Type (AppT, ConT),
   mkName,
  )
 import Prelude hiding (sum)
