@@ -14,9 +14,17 @@ module Data.Boltzmann.Sampler.TH (mkSampler) where
 
 import Control.Monad (guard)
 import qualified Control.Monad.Trans as T
+import Data.Boltzmann.Samplable (
+  Samplable (constrDistribution),
+ )
 import Data.Boltzmann.Sampler (sample)
 import Data.BuffonMachine (choice)
-import Language.Haskell.TH (Exp (DoE, LamCaseE, TupE), Pat (VarP), Stmt (NoBindS), newName)
+import Language.Haskell.TH (
+  Exp (DoE, LamCaseE, TupE),
+  Pat (VarP),
+  Stmt (NoBindS),
+  newName,
+ )
 import Language.Haskell.TH.Datatype (
   ConstructorInfo (constructorName),
   DatatypeInfo (..),
@@ -28,14 +36,14 @@ import Language.Haskell.TH.Syntax (
   Body (NormalB),
   Clause (Clause),
   Dec (FunD, InstanceD),
-  Exp (AppE, ConE, InfixE, LamE, LitE, VarE),
-  Lit (IntegerL, StringL),
+  Exp (AppE, ConE, InfixE, LamE, LitE, SigE, VarE),
+  Lit (IntegerL),
   Match (Match),
   Name,
   Pat (LitP, TupP),
   Q,
   Stmt (BindS),
-  Type (AppT, ConT),
+  Type (AppT, ConT, VarT),
   mkName,
  )
 import Prelude hiding (sum)
@@ -67,12 +75,19 @@ fresh s = do
   x <- newName s
   return (VarP x, VarE x)
 
+constrExp :: ConstructorInfo -> Q Exp
+constrExp info = do
+  undef <- [|undefined|]
+  pure $ foldl AppE (ConE name) $ map (const undef) args
+  where
+    name = constructorName info
+    args = constructorFields info
+
 constructor :: Name -> Q Exp
 constructor = return . ConE . mkName . show -- note: we're using fully qualified constructors
 
-weightQuery :: Name -> Q Exp
-weightQuery name =
-  return $ AppE (var "weight") (LitE (StringL (show name)))
+weightQuery :: ConstructorInfo -> Q Exp
+weightQuery con = [|weight $(constrExp con)|]
 
 genMatchExprs :: [(ConstructorInfo, Integer)] -> Q Exp
 genMatchExprs constrGroup = do
@@ -89,9 +104,9 @@ genConExpr :: ConstructorInfo -> Q Exp
 genConExpr con = do
   argStmtExpr <- genArgExprs con
   case stmts argStmtExpr of
-    [] -> [|return ($(constructor (constructorName con)), $(weightQuery (constructorName con)))|]
+    [] -> [|return ($(constructor (constructorName con)), $(weightQuery con))|]
     _ -> do
-      w <- weightQuery (constructorName con)
+      w <- weightQuery con
       constrApp <- genConstrApplication (constructorName con) (objs argStmtExpr)
       weightSum <- sum w (weights argStmtExpr)
       return' <- [|return|]
@@ -115,7 +130,7 @@ data ArgStmtExpr = ArgStmtExpr
 
 genArgExprs :: ConstructorInfo -> Q ArgStmtExpr
 genArgExprs con = do
-  w <- weightQuery (constructorName con)
+  w <- weightQuery con
   ubExpr <- var "ub" `minus` [w]
   genArgExprs' ubExpr (constructorFields con)
 
@@ -127,7 +142,7 @@ genArgExprs' ubExpr (_ : as) = do
   argExpr <- [|sample|]
   ubExpr' <- ubExpr `minus` [w]
   argStmtExpr <- genArgExprs' ubExpr' as
-  let stmt = BindS (TupP [xp, wp]) (AppE (AppE (AppE argExpr (VarE $ mkName "ddgs")) (VarE $ mkName "weight")) ubExpr)
+  let stmt = BindS (TupP [xp, wp]) (AppE argExpr ubExpr)
   return
     ArgStmtExpr
       { stmts = stmt : stmts argStmtExpr
@@ -139,11 +154,9 @@ genChoiceExpr :: Name -> Q Exp
 genChoiceExpr typ = do
   choice' <- [|choice|]
   lift' <- [|T.lift|]
-  ddgs' <- [|ddgs $(genName typ)|]
-  return $ foldr AppE ddgs' [lift', choice']
-
-genName :: Name -> Q Exp
-genName name = return (LitE $ StringL (show name))
+  ddgs' <- [|constrDistribution|]
+  let typ' = SigE ddgs' $ AppT (ConT $ mkName "Distribution") (ConT typ)
+  return $ foldr AppE typ' [lift', choice']
 
 genGuardExpr :: Q Exp
 genGuardExpr = do
@@ -164,7 +177,7 @@ gen typ = do
 
   return $
     LamE
-      [pat "ddgs", pat "weight", pat "ub"]
+      [pat "ub"]
       $ DoE
         Nothing
         [ NoBindS guardExpr

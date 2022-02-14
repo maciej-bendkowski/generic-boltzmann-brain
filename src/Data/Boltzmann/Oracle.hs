@@ -22,7 +22,6 @@ import Data.Boltzmann.Specifiable (
  )
 import Data.Boltzmann.Specification (getWeight)
 import qualified Data.Boltzmann.Specification as S
-import Data.BuffonMachine (DDG)
 import qualified Data.Map as Map
 import Data.Map.Strict (Map)
 import Data.Maybe (fromJust)
@@ -42,6 +41,7 @@ import Data.Paganini (
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.Vector (
+  Vector,
   fromList,
  )
 import Instances.TH.Lift ()
@@ -58,6 +58,8 @@ import Language.Haskell.TH.Syntax (
   Pat (LitP),
   Q,
  )
+
+type DDG = Vector Int
 
 -- nicer sum for non-empty lists.
 sum' :: Num a => [a] -> a

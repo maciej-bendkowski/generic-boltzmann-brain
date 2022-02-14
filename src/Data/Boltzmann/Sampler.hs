@@ -1,8 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskellQuotes #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 -- |
@@ -14,53 +12,37 @@
 -- Stability   : experimental
 module Data.Boltzmann.Sampler (
   RejectionSampler,
-  DDGSelector,
-  WeightSelector,
   BoltzmannSampler (..),
   rejectionSampler,
   rejectionSamplerIO,
 ) where
 
-import Control.Monad (guard)
-import Control.Monad.Trans (MonadTrans (lift))
 import Control.Monad.Trans.Maybe (MaybeT, runMaybeT)
-import Data.Boltzmann.Specifiable (Specifiable, listTypeName)
-import Data.BuffonMachine (BuffonMachine, DDG, choice, runIO)
+import Data.BuffonMachine (BuffonMachine, runIO)
 import System.Random (RandomGen, StdGen)
 
 -- | Samplers which might "reject" generated objects, i.e. return `Nothing` instead.
 type RejectionSampler g a = MaybeT (BuffonMachine g) (a, Int)
 
--- | Selector functions mapping (fully qualified) constructor names to their `DDG`s.
-type DDGSelector = String -> DDG
-
--- | Selector functions mapping (fully qualified) constructor names to their weights.
-type WeightSelector = String -> Int
-
 -- | Multiparametric Boltzmann samplers.
 class BoltzmannSampler a where
   sample ::
     RandomGen g =>
-    -- | Function mapping constructor names to corresponding `DDG`s.
-    DDGSelector ->
-    -- | Function mapping constructor names to corresponding weights.
-    WeightSelector ->
-    -- | Upper bound for the generated objects' weight.
     Int ->
     RejectionSampler g a
 
-instance (Specifiable a, BoltzmannSampler a) => BoltzmannSampler [a] where
-  sample ddgs weight ub = do
-    guard (ub > 0)
-    lift (choice (ddgs $ listTypeName (undefined :: a)))
-      >>= ( \case
-              0 -> return ([], weight (show '[]))
-              _ -> do
-                let wcons = weight (show '(:))
-                (x, w) <- sample ddgs weight (ub - wcons)
-                (xs, ws) <- sample ddgs weight (ub - wcons - w)
-                return (x : xs, w + ws + wcons)
-          )
+-- instance (Specifiable a, BoltzmannSampler a) => BoltzmannSampler [a] where
+--   sample ddgs weight ub = do
+--     guard (ub > 0)
+--     lift (choice (ddgs $ listTypeName (undefined :: a)))
+--       >>= ( \case
+--               0 -> return ([], weight (show '[]))
+--               _ -> do
+--                 let wcons = weight (show '(:))
+--                 (x, w) <- sample ddgs weight (ub - wcons)
+--                 (xs, ws) <- sample ddgs weight (ub - wcons - w)
+--                 return (x : xs, w + ws + wcons)
+--           )
 
 -- | Rejection sampler generating objects within a prescribed size window.
 rejectionSampler ::

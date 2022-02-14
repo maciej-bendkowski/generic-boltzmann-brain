@@ -27,6 +27,7 @@ dependencies:
 - template-haskell >= 2.17.0.0
 - th-abstraction >= 0.4.3.0
 - th-lift-instances >= 0.1.18
+- th-lift >= 0.8.2
 - mtl >= 2.2.2
 - paganini-hs >= 0.3.0.0
 

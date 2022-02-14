@@ -1,10 +1,14 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE NumericUnderscores #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module BinTree where
 
+import Data.Boltzmann.Samplable
+import Data.Boltzmann.Samplable.TH (makeSamplable)
 import Data.Boltzmann.Sampler (BoltzmannSampler (..))
 import Data.Boltzmann.Sampler.TH (mkSampler)
 import Data.Boltzmann.Specifiable (
@@ -17,6 +21,10 @@ import Data.Boltzmann.Specification (
   withWeights,
   (==>),
  )
+import Data.Boltzmann.System (System (..))
+import Data.Boltzmann.Weighed (Weighed (..))
+import Data.Boltzmann.Weighed.TH (makeWeighed)
+import Data.BuffonMachine
 import GHC.Generics (Generic)
 
 data BinTree
@@ -24,14 +32,22 @@ data BinTree
   | Node BinTree BinTree
   deriving (Show, Generic, Specifiable)
 
-binTreeSysSpec :: SystemSpec
-binTreeSysSpec =
-  (undefined :: BinTree, 10_000)
-    `withSystem` [ specification
-                    (undefined :: BinTree)
-                    ( withWeights
-                        ['Leaf ==> 0]
-                    )
-                 ]
+makeWeighed
+  ''BinTree
+  [ ('Leaf, 0)
+  , ('Node, 1)
+  ]
+
+makeSamplable
+  System
+    { targetType = ''BinTree
+    , meanSize = 1000
+    , frequencies = []
+    , weights = []
+    }
+
+newtype T = T BinTree
+  deriving stock (Show, Generic)
+  deriving (Specifiable) via BinTree
 
 $(mkSampler ''BinTree)

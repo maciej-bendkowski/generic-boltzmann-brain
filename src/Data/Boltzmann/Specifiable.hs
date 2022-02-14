@@ -16,7 +16,8 @@
 -- Maintainer  : maciej.bendkowski@gmail.com
 -- Stability   : experimental
 --
--- Specifiable types, i.e. types which have corresponding (multiparametric) samplers.
+-- Specifiable types, i.e. types which have corresponding (multiparametric)
+-- samplers.
 module Data.Boltzmann.Specifiable (
   SpecifiableType (..),
   TypeDef,
@@ -114,10 +115,12 @@ class GSpecifiable' f where
 
 instance (GSpecifiable' f, GSpecifiable' g) => GSpecifiable' (f :+: g) where
   gtypedef' moduleName (_ :: (f :+: g) a) =
-    gtypedef' moduleName (undefined :: f a) ++ gtypedef' moduleName (undefined :: g a)
+    gtypedef' moduleName (undefined :: f a)
+      ++ gtypedef' moduleName (undefined :: g a)
 
 instance (Constructor c, GConsArg f) => GSpecifiable' (C1 c f) where
-  gtypedef' moduleName x = [Cons (qualifier ++ conName x) (gargs (undefined :: f a))]
+  gtypedef' moduleName x =
+    [Cons (qualifier ++ conName x) (gargs (undefined :: f a))]
     where
       qualifier = moduleName ++ "."
 
