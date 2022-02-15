@@ -12,7 +12,7 @@ import Data.Boltzmann.System (
 import qualified Data.Map as Map
 import Data.Map.Strict (Map)
 
-import Data.BuffonMachine (Distribution)
+import Data.Boltzmann.Samplable (Distribution)
 import Language.Haskell.TH (Q, runIO)
 import Language.Haskell.TH.Datatype (DatatypeInfo)
 import Language.Haskell.TH.Syntax (
@@ -24,7 +24,10 @@ import Language.Haskell.TH.Syntax (
   mkName,
  )
 
-sysDistributions :: System -> Map Name DatatypeInfo -> IO (Map Name (Distribution a))
+sysDistributions ::
+  System ->
+  Map Name DatatypeInfo ->
+  IO (Map Name (Distribution a))
 sysDistributions sys types = do
   spec <- paganiniSpecIO sys types
   return $ case spec of

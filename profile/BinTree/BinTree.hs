@@ -9,7 +9,6 @@ import Data.Boltzmann.Sampler.TH (mkSampler)
 import Data.Boltzmann.System (System (..))
 import Data.Boltzmann.Weighed (Weighed (..))
 import Data.Boltzmann.Weighed.TH (makeWeighed)
-import Data.BuffonMachine
 
 data BinTree
   = Leaf

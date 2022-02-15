@@ -10,7 +10,7 @@ module Data.Boltzmann.System (
 import Language.Haskell.TH.Syntax (Name, Type (ConT))
 
 import Control.Monad (foldM, forM_, replicateM, unless)
-import Data.BuffonMachine (Distribution (Distribution))
+import Data.Boltzmann.Samplable (Distribution (Distribution))
 import qualified Data.Map as Map
 import Data.Map.Strict (Map)
 import Data.Maybe (fromJust, fromMaybe)

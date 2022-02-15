@@ -1,5 +1,3 @@
-{-# LANGUAGE TemplateHaskell #-}
-
 -- |
 -- Module      : Data.BuffonMachine
 -- Description : Buffon machines providing random variates for discrete probability distributions.
@@ -21,10 +19,9 @@ module Data.BuffonMachine (
   BuffonMachine,
   Discrete,
   Oracle (..),
-  Distribution (..),
-  choice,
   run,
   runIO,
+  getBit,
 ) where
 
 import Control.Monad.Trans.State.Strict (
@@ -34,14 +31,11 @@ import Control.Monad.Trans.State.Strict (
   modify',
   put,
  )
-import Language.Haskell.TH.Lift (deriveLift)
 
 import Data.Bits (Bits (testBit))
-import Data.Vector (Vector, null, (!))
 import Data.Word (Word32)
 import Instances.TH.Lift ()
 import System.Random (Random (random), RandomGen, StdGen, getStdGen)
-import Prelude hiding (null)
 
 -- | Buffered random bit oracle.
 data Oracle g = Oracle
@@ -68,7 +62,7 @@ currentBit oracle = testBit (buffer oracle) (usedBits oracle)
 
 -- |
 --  Buffon machines implemented as a `State` monad over `Oracle`.
-type BuffonMachine g = State (Oracle g)
+type BuffonMachine g = Control.Monad.Trans.State.Strict.State (Oracle g)
 
 type Bern g = BuffonMachine g Bool
 
@@ -81,40 +75,19 @@ regenerate oracle =
 
 getBit :: RandomGen g => Bern g
 getBit = do
-  modify' regenerate
-  oracle <- get
-  put $ useBit oracle
+  Control.Monad.Trans.State.Strict.modify' regenerate
+  oracle <- Control.Monad.Trans.State.Strict.get
+  Control.Monad.Trans.State.Strict.put $ useBit oracle
   return $ currentBit oracle
 
 -- |
 --  Buffon machine computations resulting in discrete random variables.
 type Discrete g = BuffonMachine g Int
 
-newtype Distribution a = Distribution {unDistribution :: Vector Int}
-deriveLift ''Distribution
-
--- |
---  Given a compact discrete distribution generating tree (in vector form)
---  computes a discrete random variable following that distribution.
-choice :: RandomGen g => Distribution a -> Discrete g
-choice enc
-  | null (unDistribution enc) = return 0
-  | otherwise = choice' enc 0
-{-# SPECIALIZE choice :: Distribution a -> Discrete StdGen #-}
-
-choice' :: RandomGen g => Distribution a -> Int -> Discrete g
-choice' enc c = do
-  h <- getBit
-  let b = fromEnum h
-  let c' = unDistribution enc ! (c + b)
-  if unDistribution enc ! c' < 0
-    then return $ -(1 + unDistribution enc ! c')
-    else choice' enc c'
-
 -- |
 --  Runs the given Buffon machine computation using the given random generator.
 run :: RandomGen g => BuffonMachine g a -> g -> a
-run m = evalState m . fresh
+run m = Control.Monad.Trans.State.Strict.evalState m . fresh
 
 -- |
 --  Runs the given Buffon machine computation within the IO monad using StdGen

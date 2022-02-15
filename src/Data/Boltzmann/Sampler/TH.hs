@@ -14,11 +14,8 @@ module Data.Boltzmann.Sampler.TH (mkSampler) where
 
 import Control.Monad (guard)
 import qualified Control.Monad.Trans as T
-import Data.Boltzmann.Samplable (
-  Samplable (constrDistribution),
- )
+import Data.Boltzmann.Samplable (Samplable (constrDistribution), choice)
 import Data.Boltzmann.Sampler (sample)
-import Data.BuffonMachine (choice)
 import Language.Haskell.TH (
   Exp (DoE, LamCaseE, TupE),
   Pat (VarP),
