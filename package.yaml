@@ -37,12 +37,12 @@ library:
   - -O2
   - -Wall
   - -Wcompat
+  - -Wmissing-export-lists
   - -Wincomplete-record-updates
   - -Wincomplete-uni-patterns
   - -Wredundant-constraints
   - -Wno-name-shadowing
   - -fwarn-missing-signatures
-  - -ddump-splices
 
 executables:
   binTreeProfile:
@@ -52,6 +52,7 @@ executables:
     - -O2
     - -Wall
     - -Wcompat
+    - -Wmissing-export-lists
     - -Wincomplete-record-updates
     - -Wincomplete-uni-patterns
     - -Wredundant-constraints
@@ -60,25 +61,6 @@ executables:
     - -ddump-splices
     dependencies:
     - generic-boltzmann-brain
-
-benchmarks:
-  binTree:
-    main:        BinTreeBenchmark.hs
-    source-dirs: benchmark/BinTree
-    ghc-options:
-    - -O2
-    - -Wall
-    - -Wcompat
-    - -Wincomplete-record-updates
-    - -Wincomplete-uni-patterns
-    - -Wredundant-constraints
-    - -Wno-name-shadowing
-    - -fwarn-missing-signatures
-    - -ddump-splices
-    dependencies:
-    - generic-boltzmann-brain
-    - criterion >= 1.5.12.0
-    - deepseq >= 1.4.5.0
 
 tests:
   generic-boltzmann-brain-test:
@@ -88,12 +70,12 @@ tests:
     - -O2
     - -Wall
     - -Wcompat
+    - -Wmissing-export-lists
     - -Wincomplete-record-updates
     - -Wincomplete-uni-patterns
     - -Wredundant-constraints
     - -Wno-name-shadowing
     - -fwarn-missing-signatures
-    - -ddump-splices
     dependencies:
     - generic-boltzmann-brain
     - tasty >= 1.4.2
