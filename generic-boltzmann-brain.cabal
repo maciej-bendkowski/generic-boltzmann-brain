@@ -32,8 +32,6 @@ library
       Data.Boltzmann.Sampler.TH
       Data.Boltzmann.System
       Data.Boltzmann.System.TH
-      Data.Boltzmann.Weighed
-      Data.Boltzmann.Weighed.TH
       Data.BuffonMachine
   other-modules:
       Paths_generic_boltzmann_brain

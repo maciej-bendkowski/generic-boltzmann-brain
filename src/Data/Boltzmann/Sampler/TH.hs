@@ -16,6 +16,7 @@ import Data.Boltzmann.Sampler (sample)
 import Data.Boltzmann.System (
   System,
   collectTypes,
+  getWeight,
  )
 import qualified Data.Map as Map
 import Language.Haskell.TH (
@@ -31,6 +32,7 @@ import Language.Haskell.TH.Datatype (
   constructorName,
   reifyDatatype,
  )
+import Language.Haskell.TH.Lift (lift)
 import Language.Haskell.TH.Syntax (
   Body (NormalB),
   Clause (Clause),
@@ -74,46 +76,40 @@ fresh s = do
   x <- newName s
   return (VarP x, VarE x)
 
-constrExp :: ConstructorInfo -> Q Exp
-constrExp info = do
-  undef <- [|undefined|]
-  pure $ foldl AppE (ConE name) $ map (const undef) args
-  where
-    name = constructorName info
-    args = constructorFields info
-
 constructor :: Name -> Q Exp
 constructor = return . ConE . mkName . show -- note: we're using fully qualified constructors
 
-weightQuery :: ConstructorInfo -> Q Exp
-weightQuery con = [|weight $(constrExp con)|]
+weightQuery :: System -> ConstructorInfo -> Q Exp
+weightQuery sys con = lift (sys `getWeight` name)
+  where
+    name = constructorName con
 
-genMatchExprs :: [(ConstructorInfo, Integer)] -> Q Exp
-genMatchExprs constrGroup = do
-  matchExprs <- mapM genMatchExpr constrGroup
+genMatchExprs :: System -> [(ConstructorInfo, Integer)] -> Q Exp
+genMatchExprs sys constrGroup = do
+  matchExprs <- mapM (genMatchExpr sys) constrGroup
   return $ LamCaseE matchExprs
 
-genMatchExpr :: (ConstructorInfo, Integer) -> Q Match
-genMatchExpr (con, n) = do
+genMatchExpr :: System -> (ConstructorInfo, Integer) -> Q Match
+genMatchExpr sys (con, n) = do
   let n' = LitP $ IntegerL n
-  conExpr <- genConExpr con
+  conExpr <- genConExpr sys con
   return $ Match n' (NormalB conExpr) []
 
-genConExpr :: ConstructorInfo -> Q Exp
-genConExpr con = do
-  argStmtExpr <- genArgExprs con
+genConExpr :: System -> ConstructorInfo -> Q Exp
+genConExpr sys con = do
+  argStmtExpr <- genArgExprs sys con
   case asStmts argStmtExpr of
-    [] -> [|return ($(constructor (constructorName con)), $(weightQuery con))|]
+    [] -> [|pure ($(constructor (constructorName con)), $(weightQuery sys con))|]
     _ -> do
-      w <- weightQuery con
+      w <- weightQuery sys con
       constrApp <- genConstrApplication (constructorName con) (asObjs argStmtExpr)
       weightSum <- sum w (asWeights argStmtExpr)
-      return' <- [|return|]
+      pure' <- [|pure|]
       return $
         DoE
           Nothing
           ( asStmts argStmtExpr
-              ++ [NoBindS $ AppE return' (TupE [Just constrApp, Just weightSum])]
+              ++ [NoBindS $ AppE pure' (TupE [Just constrApp, Just weightSum])]
           )
 
 genConstrApplication :: Name -> [Exp] -> Q Exp
@@ -127,9 +123,9 @@ data ArgStmtExpr = ArgStmtExpr
   , asWeights :: [Exp]
   }
 
-genArgExprs :: ConstructorInfo -> Q ArgStmtExpr
-genArgExprs con = do
-  w <- weightQuery con
+genArgExprs :: System -> ConstructorInfo -> Q ArgStmtExpr
+genArgExprs sys con = do
+  w <- weightQuery sys con
   ubExpr <- var "ub" `minus` [w]
   genArgExprs' ubExpr (constructorFields con)
 
@@ -165,13 +161,13 @@ genGuardExpr = do
   guardExpr <- [|guard|]
   return $ AppE guardExpr compExpr
 
-gen :: Name -> Q Exp
-gen typ = do
+gen :: System -> Name -> Q Exp
+gen sys typ = do
   guardExpr <- genGuardExpr
   choiceExpr <- genChoiceExpr typ
 
   constrGroup <- genConstrGroup typ
-  caseExpr <- genMatchExprs constrGroup
+  caseExpr <- genMatchExprs sys constrGroup
   bindOp <- [|(>>=)|]
 
   return $
@@ -190,9 +186,9 @@ genConstrGroup typ = do
   return $ zip consInfo [0 :: Integer ..]
 
 -- | Given a type name `a`, instantiates it as `BoltzmannSampler` of `a`.
-mkBoltzmannSampler' :: Name -> Q [Dec]
-mkBoltzmannSampler' typ = do
-  samplerBody <- gen typ
+mkBoltzmannSampler' :: System -> Name -> Q [Dec]
+mkBoltzmannSampler' sys typ = do
+  samplerBody <- gen sys typ
   let clazz = AppT (ConT $ mkName "BoltzmannSampler") (ConT typ)
       funDec = FunD (mkName "sample") [Clause [] (NormalB samplerBody) []]
       inst = InstanceD Nothing [] clazz [funDec]
@@ -202,6 +198,6 @@ mkBoltzmannSampler :: System -> Q [Dec]
 mkBoltzmannSampler sys = do
   types <- collectTypes sys
   decls <- forM (Map.toList types) $ \(typ, _) -> do
-    mkBoltzmannSampler' typ
+    mkBoltzmannSampler' sys typ
 
   pure $ concat decls

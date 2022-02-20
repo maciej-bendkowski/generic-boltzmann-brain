@@ -7,7 +7,6 @@ import Data.Boltzmann.Samplable (Distribution (..), Samplable (..))
 import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
 import Data.Boltzmann.System (System (..))
 import Data.Boltzmann.System.TH (mkSystemBoltzmannSampler)
-import Data.Boltzmann.Weighed (Weighed (..))
 import Data.BuffonMachine (evalIO)
 import System.Random.SplitMix (SMGen)
 

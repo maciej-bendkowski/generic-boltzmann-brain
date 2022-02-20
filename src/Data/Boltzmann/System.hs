@@ -1,6 +1,7 @@
 module Data.Boltzmann.System (
   collectTypes,
   System (..),
+  getWeight,
   paganiniSpecIO,
 ) where
 
