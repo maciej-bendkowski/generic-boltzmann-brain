@@ -2,9 +2,10 @@ module Test.Unit.Samplable (unitTests) where
 
 import Control.Monad (replicateM)
 import Data.Boltzmann.Samplable (Distribution (..), choice)
-import Data.BuffonMachine (runIO)
+import Data.BuffonMachine (evalIO)
 import qualified Data.Map as Map
 import Data.Vector (fromList)
+import System.Random.SplitMix (SMGen)
 import Test.Tasty (
   TestTree,
   testGroup,
@@ -60,8 +61,8 @@ distributionD :: Distribution a
 distributionD = Distribution $ fromList []
 
 choiceTest :: Distribution a -> Int -> IO [(Int, Double)]
-choiceTest dist n = runIO $ do
-  sam <- replicateM n (choice dist)
+choiceTest dist n = evalIO $ do
+  sam <- replicateM n (choice @SMGen dist)
   let groups = frequency sam
   return $ map (\(k, s) -> (k, fromIntegral s / fromIntegral n)) groups
 

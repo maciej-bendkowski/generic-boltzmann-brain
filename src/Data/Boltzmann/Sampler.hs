@@ -1,8 +1,3 @@
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UndecidableInstances #-}
-
 -- |
 -- Module      : Data.Boltzmann.Sampler
 -- Description : Boltzmann sampler for specifiable types.
@@ -11,66 +6,35 @@
 -- Maintainer  : maciej.bendkowski@gmail.com
 -- Stability   : experimental
 module Data.Boltzmann.Sampler (
-  RejectionSampler,
   BoltzmannSampler (..),
   rejectionSampler,
-  rejectionSamplerIO,
+  lift,
 ) where
 
 import Control.Monad.Trans.Maybe (MaybeT, runMaybeT)
-import Data.BuffonMachine (BuffonMachine, runIO)
-import System.Random (RandomGen, StdGen)
-
--- | Samplers which might "reject" generated objects, i.e. return `Nothing` instead.
-type RejectionSampler g a = MaybeT (BuffonMachine g) (a, Int)
+import Data.BuffonMachine (BuffonMachine, eval)
+import System.Random (RandomGen)
+import Test.QuickCheck (Gen)
+import Test.QuickCheck.Gen (Gen (MkGen))
+import Test.QuickCheck.Random (QCGen (QCGen))
 
 -- | Multiparametric Boltzmann samplers.
 class BoltzmannSampler a where
-  sample ::
-    RandomGen g =>
-    Int ->
-    RejectionSampler g a
+  sample :: RandomGen g => Int -> MaybeT (BuffonMachine g) (a, Int)
 
--- instance (Specifiable a, BoltzmannSampler a) => BoltzmannSampler [a] where
---   sample ddgs weight ub = do
---     guard (ub > 0)
---     lift (choice (ddgs $ listTypeName (undefined :: a)))
---       >>= ( \case
---               0 -> return ([], weight (show '[]))
---               _ -> do
---                 let wcons = weight (show '(:))
---                 (x, w) <- sample ddgs weight (ub - wcons)
---                 (xs, ws) <- sample ddgs weight (ub - wcons - w)
---                 return (x : xs, w + ws + wcons)
---           )
-
--- | Rejection sampler generating objects within a prescribed size window.
 rejectionSampler ::
-  RandomGen g =>
-  -- | Function producing rejection samplers given weight upper bounds.
-  (Int -> RejectionSampler g a) ->
-  -- | Lower bound for the generated objects' weight.
-  Int ->
-  -- | Upper bound for the generated objects' weight.
-  Int ->
-  BuffonMachine g a
-rejectionSampler sam lb ub =
-  do
-    str <- runMaybeT (sam ub)
-    case str of
-      Nothing -> rejectionSampler sam lb ub
-      Just (x, s) ->
-        if lb <= s && s <= ub
-          then return x
-          else rejectionSampler sam lb ub
+  (RandomGen g, BoltzmannSampler a) => Int -> Int -> BuffonMachine g a
+rejectionSampler lb ub = do
+  runMaybeT (sample ub)
+    >>= ( \case
+            Nothing -> rejectionSampler lb ub
+            Just (obj, s) ->
+              if lb <= s && s <= ub
+                then pure obj
+                else rejectionSampler lb ub
+        )
 
--- | `IO` variant of `rejectionsampler`.
-rejectionSamplerIO ::
-  -- | Function producing rejection samplers given weight upper bounds.
-  (Int -> RejectionSampler StdGen a) ->
-  -- | Lower bound for the generated objects' weight.
-  Int ->
-  -- | Upper bound for the generated objects' weight.
-  Int ->
-  IO a
-rejectionSamplerIO sam lb ub = runIO (rejectionSampler sam lb ub)
+lift :: BoltzmannSampler a => Gen a
+lift = MkGen $ \(QCGen g) n ->
+  let machine = rejectionSampler 0 n
+   in eval machine g

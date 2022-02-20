@@ -1,8 +1,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module BinTree where
+module BinTree (BinTree (..)) where
 
-import Data.Boltzmann.Samplable
+import Data.Boltzmann.Samplable (Distribution, Samplable (..))
 import Data.Boltzmann.Samplable.TH (makeSamplable)
 import Data.Boltzmann.Sampler (BoltzmannSampler (..))
 import Data.Boltzmann.Sampler.TH (mkSampler)

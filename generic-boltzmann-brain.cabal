@@ -38,13 +38,17 @@ library
       Paths_generic_boltzmann_brain
   hs-source-dirs:
       src
+  default-extensions:
+      LambdaCase BangPatterns DerivingVia FlexibleInstances UndecidableInstances TypeApplications ScopedTypeVariables Rank2Types
   ghc-options: -O2 -Wall -Wcompat -Wmissing-export-lists -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -Wno-name-shadowing -fwarn-missing-signatures
   build-depends:
-      base >=4.7 && <5
+      QuickCheck >=2.14.2
+    , base >=4.7 && <5
     , containers >=0.6.4
     , mtl >=2.2.2
     , paganini-hs >=0.3.0.0
     , random >=1.2.0
+    , splitmix >=0.1.0.4
     , template-haskell >=2.17.0.0
     , th-abstraction >=0.4.3.0
     , th-lift >=0.8.2
@@ -61,14 +65,18 @@ executable binTreeProfile
       Paths_generic_boltzmann_brain
   hs-source-dirs:
       profile/BinTree
+  default-extensions:
+      LambdaCase BangPatterns DerivingVia FlexibleInstances UndecidableInstances TypeApplications ScopedTypeVariables Rank2Types
   ghc-options: -O2 -Wall -Wcompat -Wmissing-export-lists -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -Wno-name-shadowing -fwarn-missing-signatures -ddump-splices
   build-depends:
-      base >=4.7 && <5
+      QuickCheck >=2.14.2
+    , base >=4.7 && <5
     , containers >=0.6.4
     , generic-boltzmann-brain
     , mtl >=2.2.2
     , paganini-hs >=0.3.0.0
     , random >=1.2.0
+    , splitmix >=0.1.0.4
     , template-haskell >=2.17.0.0
     , th-abstraction >=0.4.3.0
     , th-lift >=0.8.2
@@ -85,6 +93,8 @@ test-suite generic-boltzmann-brain-test
       Paths_generic_boltzmann_brain
   hs-source-dirs:
       test
+  default-extensions:
+      LambdaCase BangPatterns DerivingVia FlexibleInstances UndecidableInstances TypeApplications ScopedTypeVariables Rank2Types
   ghc-options: -O2 -Wall -Wcompat -Wmissing-export-lists -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -Wno-name-shadowing -fwarn-missing-signatures
   build-depends:
       QuickCheck >=2.14.2
@@ -94,6 +104,7 @@ test-suite generic-boltzmann-brain-test
     , mtl >=2.2.2
     , paganini-hs >=0.3.0.0
     , random >=1.2.0
+    , splitmix >=0.1.0.4
     , tasty >=1.4.2
     , tasty-hunit >=0.10.0
     , tasty-quickcheck >=0.10.0

@@ -30,6 +30,8 @@ dependencies:
 - th-lift >= 0.8.2
 - mtl >= 2.2.2
 - paganini-hs >= 0.3.0.0
+- QuickCheck >= 2.14.2
+- splitmix >= 0.1.0.4
 
 library:
   source-dirs: src
@@ -43,6 +45,15 @@ library:
   - -Wredundant-constraints
   - -Wno-name-shadowing
   - -fwarn-missing-signatures
+  default-extensions:
+    LambdaCase
+    BangPatterns
+    DerivingVia
+    FlexibleInstances
+    UndecidableInstances
+    TypeApplications
+    ScopedTypeVariables
+    Rank2Types
 
 executables:
   binTreeProfile:
@@ -61,6 +72,15 @@ executables:
     - -ddump-splices
     dependencies:
     - generic-boltzmann-brain
+    default-extensions:
+      LambdaCase
+      BangPatterns
+      DerivingVia
+      FlexibleInstances
+      UndecidableInstances
+      TypeApplications
+      ScopedTypeVariables
+      Rank2Types
 
 tests:
   generic-boltzmann-brain-test:
@@ -82,3 +102,12 @@ tests:
     - tasty-hunit >= 0.10.0
     - tasty-quickcheck >= 0.10.0
     - QuickCheck >= 2.14.2
+    default-extensions:
+      LambdaCase
+      BangPatterns
+      DerivingVia
+      FlexibleInstances
+      UndecidableInstances
+      TypeApplications
+      ScopedTypeVariables
+      Rank2Types
