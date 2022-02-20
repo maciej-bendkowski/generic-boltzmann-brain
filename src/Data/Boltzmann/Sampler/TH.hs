@@ -9,10 +9,15 @@
 -- Stability   : experimental
 module Data.Boltzmann.Sampler.TH (mkBoltzmannSampler) where
 
-import Control.Monad (guard)
+import Control.Monad (forM, guard)
 import qualified Control.Monad.Trans as T
 import Data.Boltzmann.Samplable (Samplable (constrDistribution), choice)
 import Data.Boltzmann.Sampler (sample)
+import Data.Boltzmann.System (
+  System,
+  collectTypes,
+ )
+import qualified Data.Map as Map
 import Language.Haskell.TH (
   Exp (DoE, LamCaseE, TupE),
   Pat (VarP),
@@ -97,17 +102,17 @@ genMatchExpr (con, n) = do
 genConExpr :: ConstructorInfo -> Q Exp
 genConExpr con = do
   argStmtExpr <- genArgExprs con
-  case stmts argStmtExpr of
+  case asStmts argStmtExpr of
     [] -> [|return ($(constructor (constructorName con)), $(weightQuery con))|]
     _ -> do
       w <- weightQuery con
-      constrApp <- genConstrApplication (constructorName con) (objs argStmtExpr)
-      weightSum <- sum w (weights argStmtExpr)
+      constrApp <- genConstrApplication (constructorName con) (asObjs argStmtExpr)
+      weightSum <- sum w (asWeights argStmtExpr)
       return' <- [|return|]
       return $
         DoE
           Nothing
-          ( stmts argStmtExpr
+          ( asStmts argStmtExpr
               ++ [NoBindS $ AppE return' (TupE [Just constrApp, Just weightSum])]
           )
 
@@ -117,9 +122,9 @@ genConstrApplication s args' = do
   return $ foldl AppE con args'
 
 data ArgStmtExpr = ArgStmtExpr
-  { stmts :: [Stmt]
-  , objs :: [Exp]
-  , weights :: [Exp]
+  { asStmts :: [Stmt]
+  , asObjs :: [Exp]
+  , asWeights :: [Exp]
   }
 
 genArgExprs :: ConstructorInfo -> Q ArgStmtExpr
@@ -129,7 +134,7 @@ genArgExprs con = do
   genArgExprs' ubExpr (constructorFields con)
 
 genArgExprs' :: Exp -> [Type] -> Q ArgStmtExpr
-genArgExprs' _ [] = return ArgStmtExpr {stmts = [], objs = [], weights = []}
+genArgExprs' _ [] = return ArgStmtExpr {asStmts = [], asObjs = [], asWeights = []}
 genArgExprs' ubExpr (_ : as) = do
   (xp, x) <- fresh "x"
   (wp, w) <- fresh "w"
@@ -139,9 +144,9 @@ genArgExprs' ubExpr (_ : as) = do
   let stmt = BindS (TupP [xp, wp]) (AppE argExpr ubExpr)
   return
     ArgStmtExpr
-      { stmts = stmt : stmts argStmtExpr
-      , objs = x : objs argStmtExpr
-      , weights = w : weights argStmtExpr
+      { asStmts = stmt : asStmts argStmtExpr
+      , asObjs = x : asObjs argStmtExpr
+      , asWeights = w : asWeights argStmtExpr
       }
 
 genChoiceExpr :: Name -> Q Exp
@@ -185,10 +190,18 @@ genConstrGroup typ = do
   return $ zip consInfo [0 :: Integer ..]
 
 -- | Given a type name `a`, instantiates it as `BoltzmannSampler` of `a`.
-mkBoltzmannSampler :: Name -> Q [Dec]
-mkBoltzmannSampler typ = do
+mkBoltzmannSampler' :: Name -> Q [Dec]
+mkBoltzmannSampler' typ = do
   samplerBody <- gen typ
   let clazz = AppT (ConT $ mkName "BoltzmannSampler") (ConT typ)
       funDec = FunD (mkName "sample") [Clause [] (NormalB samplerBody) []]
       inst = InstanceD Nothing [] clazz [funDec]
   return [inst]
+
+mkBoltzmannSampler :: System -> Q [Dec]
+mkBoltzmannSampler sys = do
+  types <- collectTypes sys
+  decls <- forM (Map.toList types) $ \(typ, _) -> do
+    mkBoltzmannSampler' typ
+
+  pure $ concat decls

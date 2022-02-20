@@ -10,6 +10,6 @@ import Language.Haskell.TH.Syntax (Dec)
 
 mkSystemBoltzmannSampler :: System -> Q [Dec]
 mkSystemBoltzmannSampler sys =
-  mkWeighed (targetType sys) (weights sys)
+  mkWeighed sys
     <> mkSamplable sys
-    <> mkBoltzmannSampler (targetType sys)
+    <> mkBoltzmannSampler sys

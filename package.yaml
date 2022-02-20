@@ -81,6 +81,31 @@ executables:
       TypeApplications
       ScopedTypeVariables
       Rank2Types
+  lambdaProfile:
+    main:        LambdaProfile.hs
+    source-dirs: profile/Lambda
+    ghc-options:
+    - -O2
+    - -Wall
+    - -Wcompat
+    - -Wmissing-export-lists
+    - -Wincomplete-record-updates
+    - -Wincomplete-uni-patterns
+    - -Wredundant-constraints
+    - -Wno-name-shadowing
+    - -fwarn-missing-signatures
+    - -ddump-splices
+    dependencies:
+    - generic-boltzmann-brain
+    default-extensions:
+      LambdaCase
+      BangPatterns
+      DerivingVia
+      FlexibleInstances
+      UndecidableInstances
+      TypeApplications
+      ScopedTypeVariables
+      Rank2Types
 
 tests:
   generic-boltzmann-brain-test:

@@ -16,7 +16,6 @@ import Language.Haskell.TH (Q)
 import Language.Haskell.TH.Datatype (
   ConstructorInfo (constructorFields, constructorName),
   DatatypeInfo (datatypeCons),
-  reifyDatatype,
  )
 import Language.Haskell.TH.Syntax (
   Body (NormalB),
@@ -31,9 +30,11 @@ import Language.Haskell.TH.Syntax (
   mkName,
  )
 
-mkWeighed :: Name -> [(Name, Int)] -> Q [Dec]
-mkWeighed typ dict = do
-  info <- reifyDatatype typ
+import Data.Boltzmann.System (System (weights), collectTypes)
+import qualified Data.Map as Map
+
+mkWeighed' :: Name -> DatatypeInfo -> [(Name, Int)] -> Q [Dec]
+mkWeighed' typ info dict = do
   matches <- forM (datatypeCons info) $ \con -> do
     let name = constructorName con
     case lookup name dict of
@@ -47,6 +48,14 @@ mkWeighed typ dict = do
       class' = AppT (ConT $ mkName "Weighed") (ConT typ)
 
   pure [InstanceD Nothing [] class' [funDec]]
+
+mkWeighed :: System -> Q [Dec]
+mkWeighed sys = do
+  types <- collectTypes sys
+  decs <- forM (Map.toList types) $ \(typ, info) -> do
+    mkWeighed' typ info (weights sys)
+
+  pure $ concat decs
 
 constrMatch :: ConstructorInfo -> Int -> Match
 constrMatch constrInfo w =
