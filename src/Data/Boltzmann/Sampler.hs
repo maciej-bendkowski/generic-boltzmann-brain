@@ -8,7 +8,7 @@
 module Data.Boltzmann.Sampler (
   BoltzmannSampler (..),
   rejectionSampler,
-  lift,
+  hoistBoltzmannSampler,
 ) where
 
 import Control.Monad.Trans.Maybe (MaybeT, runMaybeT)
@@ -27,14 +27,14 @@ rejectionSampler ::
 rejectionSampler lb ub = do
   runMaybeT (sample ub)
     >>= ( \case
-            Nothing -> rejectionSampler lb ub
             Just (obj, s) ->
               if lb <= s && s <= ub
                 then pure obj
                 else rejectionSampler lb ub
+            Nothing -> rejectionSampler lb ub
         )
 
-lift :: BoltzmannSampler a => Gen a
-lift = MkGen $ \(QCGen g) n ->
+hoistBoltzmannSampler :: BoltzmannSampler a => Gen a
+hoistBoltzmannSampler = MkGen $ \(QCGen g) n ->
   let machine = rejectionSampler 0 n
    in eval machine g

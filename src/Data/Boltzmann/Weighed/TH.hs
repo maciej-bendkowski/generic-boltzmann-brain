@@ -8,7 +8,7 @@
 -- Maintainer  : maciej.bendkowski@gmail.com
 -- Stability   : experimental
 module Data.Boltzmann.Weighed.TH (
-  makeWeighed,
+  mkWeighed,
 ) where
 
 import Control.Monad (forM)
@@ -31,8 +31,8 @@ import Language.Haskell.TH.Syntax (
   mkName,
  )
 
-makeWeighed :: Name -> [(Name, Int)] -> Q [Dec]
-makeWeighed typ dict = do
+mkWeighed :: Name -> [(Name, Int)] -> Q [Dec]
+mkWeighed typ dict = do
   info <- reifyDatatype typ
   matches <- forM (datatypeCons info) $ \con -> do
     let name = constructorName con

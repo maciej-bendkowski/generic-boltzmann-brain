@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Data.Boltzmann.Samplable.TH (makeSamplable) where
+module Data.Boltzmann.Samplable.TH (mkSamplable) where
 
 import Control.Monad (forM, void)
 import Data.Boltzmann.System (
@@ -34,12 +34,13 @@ sysDistributions sys types = do
     Left err -> error (show err)
     Right x -> x
 
-makeSamplable :: System -> Q [Dec]
-makeSamplable sys = do
+mkSamplable :: System -> Q [Dec]
+mkSamplable sys = do
   void $ hasAdmissibleFrequencies sys
 
   types <- collectTypes sys
   distrMap <- runIO $ sysDistributions sys types
+
   forM (Map.toList distrMap) $ \(typ, d) -> do
     distribution <- [|d|]
     let cls = AppT (ConT $ mkName "Samplable") (ConT typ)
