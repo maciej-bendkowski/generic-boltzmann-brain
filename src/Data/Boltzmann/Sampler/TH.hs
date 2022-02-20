@@ -7,7 +7,7 @@
 -- License     : BSD3
 -- Maintainer  : maciej.bendkowski@gmail.com
 -- Stability   : experimental
-module Data.Boltzmann.Sampler.TH (mkSampler) where
+module Data.Boltzmann.Sampler.TH (mkBoltzmannSampler) where
 
 import Control.Monad (guard)
 import qualified Control.Monad.Trans as T
@@ -185,8 +185,8 @@ genConstrGroup typ = do
   return $ zip consInfo [0 :: Integer ..]
 
 -- | Given a type name `a`, instantiates it as `BoltzmannSampler` of `a`.
-mkSampler :: Name -> Q [Dec]
-mkSampler typ = do
+mkBoltzmannSampler :: Name -> Q [Dec]
+mkBoltzmannSampler typ = do
   samplerBody <- gen typ
   let clazz = AppT (ConT $ mkName "BoltzmannSampler") (ConT typ)
       funDec = FunD (mkName "sample") [Clause [] (NormalB samplerBody) []]

@@ -1,5 +1,3 @@
-{-# LANGUAGE Rank2Types #-}
-
 module Data.Boltzmann.System (
   collectTypes,
   System (..),

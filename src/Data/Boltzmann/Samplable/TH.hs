@@ -4,7 +4,7 @@ module Data.Boltzmann.Samplable.TH (mkSamplable) where
 
 import Control.Monad (forM, void)
 import Data.Boltzmann.System (
-  System,
+  System (..),
   collectTypes,
   hasAdmissibleFrequencies,
   paganiniSpecIO,

@@ -1,5 +1,4 @@
-import BinTree (BinTree)
-import BinTreeSampler (randomBinTreeListIO)
+import BinTree (BinTree, randomBinTreeListIO)
 
 sampler :: Int -> IO [BinTree]
 sampler = randomBinTreeListIO 8000 12000

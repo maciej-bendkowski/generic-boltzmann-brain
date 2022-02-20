@@ -1,32 +1,32 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module BinTree (BinTree (..)) where
+module BinTree (BinTree (..), randomBinTreeListIO) where
 
-import Data.Boltzmann.Samplable (Distribution, Samplable (..))
-import Data.Boltzmann.Samplable.TH (mkSamplable)
-import Data.Boltzmann.Sampler (BoltzmannSampler (..))
-import Data.Boltzmann.Sampler.TH (mkSampler)
+import Control.Monad (replicateM)
+import Data.Boltzmann.Samplable (Distribution (..), Samplable (..))
+import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler)
 import Data.Boltzmann.System (System (..))
+import Data.Boltzmann.System.TH (mkSystemBoltzmannSampler)
 import Data.Boltzmann.Weighed (Weighed (..))
-import Data.Boltzmann.Weighed.TH (mkWeighed)
+import Data.BuffonMachine (evalIO)
+import System.Random.SplitMix (SMGen)
 
 data BinTree
   = Leaf
   | Node BinTree BinTree
   deriving (Show)
 
-mkWeighed
-  ''BinTree
-  [ ('Leaf, 0)
-  , ('Node, 1)
-  ]
-
-mkSamplable
+mkSystemBoltzmannSampler
   System
     { targetType = ''BinTree
     , meanSize = 1000
     , frequencies = []
-    , weights = []
+    , weights =
+        [ ('Leaf, 0)
+        , ('Node, 1)
+        ]
     }
 
-mkSampler ''BinTree
+randomBinTreeListIO :: Int -> Int -> Int -> IO [BinTree]
+randomBinTreeListIO lb ub n =
+  evalIO $ replicateM n (rejectionSampler @SMGen lb ub)
