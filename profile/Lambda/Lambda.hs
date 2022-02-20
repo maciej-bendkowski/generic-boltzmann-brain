@@ -28,9 +28,11 @@ mkSystemBoltzmannSampler
     , meanSize = 10_000
     , frequencies = []
     , weights =
-        [ ('Index, 0)
-        , ('S, 1)
+        [ -- De Bruijn
+          ('S, 1)
         , ('Z, 1)
+        , -- Lambda
+          ('Index, 0)
         , ('App, 1)
         , ('Abs, 1)
         ]

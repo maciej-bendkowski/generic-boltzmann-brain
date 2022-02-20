@@ -1,13 +1,12 @@
 module Data.Boltzmann.System (
   collectTypes,
   System (..),
-  hasAdmissibleFrequencies,
   paganiniSpecIO,
 ) where
 
 import Language.Haskell.TH.Syntax (Name, Type (ConT))
 
-import Control.Monad (foldM, forM_, replicateM, unless)
+import Control.Monad (foldM, replicateM)
 import Data.Boltzmann.Samplable (Distribution (Distribution))
 import qualified Data.Map as Map
 import Data.Map.Strict (Map)
@@ -76,24 +75,6 @@ collectFromType types typ =
   case typ of
     ConT t -> reifyDatatype t >>= collectFromDataTypeInfo types
     _ -> fail $ "Unsupported type " ++ show typ
-
-constructorNames :: System -> Q (Set Name)
-constructorNames sys = do
-  types <- collectTypes sys
-  foldMap constructorNames' (Map.keysSet types)
-
-constructorNames' :: Name -> Q (Set Name)
-constructorNames' typ = do
-  info <- reifyDatatype typ
-  let constrNames = map constructorName (datatypeCons info)
-  pure $ Set.fromList constrNames
-
-hasAdmissibleFrequencies :: System -> Q ()
-hasAdmissibleFrequencies sys = do
-  constrs <- constructorNames sys
-  forM_ (frequencies sys) $ \(con, _) ->
-    unless (con `Set.member` constrs) $
-      fail $ show con ++ " is not a constructor"
 
 mkVariables :: Set Name -> Spec (Map Name Let)
 mkVariables sys = do
