@@ -66,7 +66,7 @@ executable binTreeProfile
   hs-source-dirs:
       profile/BinTree
   default-extensions:
-      LambdaCase BangPatterns DerivingVia FlexibleInstances UndecidableInstances TypeApplications ScopedTypeVariables Rank2Types
+      NumericUnderscores LambdaCase BangPatterns DerivingVia FlexibleInstances UndecidableInstances TypeApplications ScopedTypeVariables Rank2Types
   ghc-options: -O2 -Wall -Wcompat -Wmissing-export-lists -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -Wno-name-shadowing -fwarn-missing-signatures -ddump-splices
   build-depends:
       QuickCheck >=2.14.2
@@ -93,7 +93,7 @@ executable lambdaProfile
   hs-source-dirs:
       profile/Lambda
   default-extensions:
-      LambdaCase BangPatterns DerivingVia FlexibleInstances UndecidableInstances TypeApplications ScopedTypeVariables Rank2Types
+      NumericUnderscores LambdaCase BangPatterns DerivingVia FlexibleInstances UndecidableInstances TypeApplications ScopedTypeVariables Rank2Types
   ghc-options: -O2 -Wall -Wcompat -Wmissing-export-lists -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -Wno-name-shadowing -fwarn-missing-signatures -ddump-splices
   build-depends:
       QuickCheck >=2.14.2

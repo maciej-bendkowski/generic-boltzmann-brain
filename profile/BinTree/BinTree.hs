@@ -4,7 +4,7 @@ module BinTree (BinTree (..), randomBinTreeListIO) where
 
 import Control.Monad (replicateM)
 import Data.Boltzmann.Samplable (Distribution (..), Samplable (..))
-import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler)
+import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
 import Data.Boltzmann.System (System (..))
 import Data.Boltzmann.System.TH (mkSystemBoltzmannSampler)
 import Data.Boltzmann.Weighed (Weighed (..))
@@ -27,6 +27,6 @@ mkSystemBoltzmannSampler
         ]
     }
 
-randomBinTreeListIO :: Int -> Int -> Int -> IO [BinTree]
-randomBinTreeListIO lb ub n =
-  evalIO $ replicateM n (rejectionSampler @SMGen lb ub)
+randomBinTreeListIO :: Int -> IO [BinTree]
+randomBinTreeListIO n =
+  evalIO $ replicateM n (rejectionSampler' @SMGen 1000 0.2)

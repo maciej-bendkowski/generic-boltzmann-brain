@@ -73,6 +73,7 @@ class RandomGen g => EvalIO g where
 
 type Bern g = BuffonMachine g Bool
 
+{-# INLINEABLE getBit #-}
 getBit :: RandomGen g => Bern g
 getBit = MkBuffonMachine $ do
   modify' regenerate
@@ -86,11 +87,14 @@ type Discrete g = BuffonMachine g Int
 
 -- |
 --  Runs the given Buffon machine computation using the given random generator.
+{-# INLINEABLE eval #-}
 eval :: RandomGen g => BuffonMachine g a -> g -> a
 eval m g = evalState (runBuffonMachine m) (fresh g)
 
 instance EvalIO SMGen where
+  {-# INLINE evalIO #-}
   evalIO m = eval m <$> initSMGen
 
 instance EvalIO StdGen where
+  {-# INLINE evalIO #-}
   evalIO m = eval m <$> getStdGen

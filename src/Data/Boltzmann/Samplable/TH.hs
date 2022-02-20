@@ -18,8 +18,12 @@ import Language.Haskell.TH.Datatype (DatatypeInfo)
 import Language.Haskell.TH.Syntax (
   Body (NormalB),
   Clause (Clause),
-  Dec (FunD, InstanceD),
+  Dec (FunD, InstanceD, PragmaD),
+  Inline (Inline),
   Name,
+  Phases (AllPhases),
+  Pragma (InlineP),
+  RuleMatch (FunLike),
   Type (AppT, ConT),
   mkName,
  )
@@ -44,9 +48,11 @@ mkSamplable sys = do
   forM (Map.toList distrMap) $ \(typ, d) -> do
     distribution <- [|d|]
     let cls = AppT (ConT $ mkName "Samplable") (ConT typ)
+        constrName = mkName "constrDistribution"
     pure $
       InstanceD Nothing [] cls $
         [ FunD
-            (mkName "constrDistribution")
+            constrName
             [Clause [] (NormalB distribution) []]
+        , PragmaD $ InlineP constrName Inline FunLike AllPhases
         ]

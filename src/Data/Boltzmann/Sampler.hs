@@ -8,6 +8,7 @@
 module Data.Boltzmann.Sampler (
   BoltzmannSampler (..),
   rejectionSampler,
+  rejectionSampler',
   hoistBoltzmannSampler,
 ) where
 
@@ -33,6 +34,13 @@ rejectionSampler lb ub = do
                 else rejectionSampler lb ub
             Nothing -> rejectionSampler lb ub
         )
+
+rejectionSampler' ::
+  (RandomGen g, BoltzmannSampler a) => Int -> Double -> BuffonMachine g a
+rejectionSampler' n eps = rejectionSampler lb ub
+  where
+    lb = floor $ (1 - eps) * fromIntegral n
+    ub = ceiling $ (1 + eps) * fromIntegral n
 
 hoistBoltzmannSampler :: BoltzmannSampler a => Gen a
 hoistBoltzmannSampler = MkGen $ \(QCGen g) n ->

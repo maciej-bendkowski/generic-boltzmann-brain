@@ -73,6 +73,7 @@ executables:
     dependencies:
     - generic-boltzmann-brain
     default-extensions:
+      NumericUnderscores
       LambdaCase
       BangPatterns
       DerivingVia
@@ -98,6 +99,7 @@ executables:
     dependencies:
     - generic-boltzmann-brain
     default-extensions:
+      NumericUnderscores
       LambdaCase
       BangPatterns
       DerivingVia

@@ -4,7 +4,7 @@ module Lambda (Lambda (..), randomLambdaListIO) where
 
 import Control.Monad (replicateM)
 import Data.Boltzmann.Samplable (Distribution (..), Samplable (..))
-import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler)
+import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
 import Data.Boltzmann.System (System (..))
 import Data.Boltzmann.System.TH (mkSystemBoltzmannSampler)
 import Data.Boltzmann.Weighed (Weighed (..))
@@ -25,7 +25,7 @@ data Lambda
 mkSystemBoltzmannSampler
   System
     { targetType = ''Lambda
-    , meanSize = 1000
+    , meanSize = 10_000
     , frequencies = []
     , weights =
         [ ('Index, 0)
@@ -36,6 +36,6 @@ mkSystemBoltzmannSampler
         ]
     }
 
-randomLambdaListIO :: Int -> Int -> Int -> IO [Lambda]
-randomLambdaListIO lb ub n =
-  evalIO $ replicateM n (rejectionSampler @SMGen lb ub)
+randomLambdaListIO :: Int -> IO [Lambda]
+randomLambdaListIO n =
+  evalIO $ replicateM n (rejectionSampler' @SMGen 10_000 0.2)

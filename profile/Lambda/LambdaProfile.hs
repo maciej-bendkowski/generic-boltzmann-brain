@@ -1,7 +1,4 @@
-import Lambda (Lambda, randomLambdaListIO)
-
-sampler :: Int -> IO [Lambda]
-sampler = randomLambdaListIO 8000 12000
+import Lambda (randomLambdaListIO)
 
 main :: IO ()
-main = sampler 100 >>= print
+main = randomLambdaListIO 100 >>= print

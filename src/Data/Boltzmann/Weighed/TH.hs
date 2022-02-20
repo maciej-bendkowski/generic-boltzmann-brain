@@ -20,12 +20,16 @@ import Language.Haskell.TH.Datatype (
 import Language.Haskell.TH.Syntax (
   Body (NormalB),
   Clause (Clause),
-  Dec (FunD, InstanceD),
+  Dec (FunD, InstanceD, PragmaD),
   Exp (LamCaseE, LitE),
+  Inline (Inline),
   Lit (IntegerL),
   Match (Match),
   Name,
   Pat (ConP, WildP),
+  Phases (AllPhases),
+  Pragma (InlineP),
+  RuleMatch (FunLike),
   Type (AppT, ConT),
   mkName,
  )
@@ -43,11 +47,16 @@ mkWeighed' typ info dict = do
 
   let funDec =
         FunD
-          (mkName "weight")
+          weightName
           [Clause [] (NormalB $ LamCaseE matches) []]
+
       class' = AppT (ConT $ mkName "Weighed") (ConT typ)
 
-  pure [InstanceD Nothing [] class' [funDec]]
+      weightName = mkName "weight"
+
+      pragma = PragmaD $ InlineP weightName Inline FunLike AllPhases
+
+  pure [InstanceD Nothing [] class' [pragma, funDec]]
 
 mkWeighed :: System -> Q [Dec]
 mkWeighed sys = do

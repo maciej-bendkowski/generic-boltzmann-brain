@@ -1,6 +1,6 @@
 module Data.Boltzmann.System.TH (mkSystemBoltzmannSampler) where
 
-import Data.Boltzmann.System (System (targetType, weights))
+import Data.Boltzmann.System (System)
 
 import Data.Boltzmann.Samplable.TH (mkSamplable)
 import Data.Boltzmann.Sampler.TH (mkBoltzmannSampler)
