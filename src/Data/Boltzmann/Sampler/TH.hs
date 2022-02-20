@@ -41,7 +41,7 @@ import Language.Haskell.TH.Syntax (
   Lit (IntegerL),
   Match (Match),
   Name,
-  Pat (LitP, TupP),
+  Pat (BangP, LitP, TupP),
   Q,
   Stmt (BindS),
   Type (AppT, ConT),
@@ -172,7 +172,7 @@ gen sys typ = do
 
   return $
     LamE
-      [pat "ub"]
+      [BangP $ pat "ub"]
       $ DoE
         Nothing
         [ NoBindS guardExpr
