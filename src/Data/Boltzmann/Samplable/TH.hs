@@ -4,20 +4,20 @@ module Data.Boltzmann.Samplable.TH (mkSamplable) where
 
 import Control.Monad (forM, void)
 import Data.Boltzmann.System (
+  Distributions (..),
   System (..),
+  Types (..),
   collectTypes,
   paganiniSpecIO,
  )
+
 import qualified Data.Map as Map
-import Data.Map.Strict (Map)
 
 import Data.Set (Set)
 import qualified Data.Set as Set
 
 import Control.Monad (forM_, unless)
-import Data.Boltzmann.Samplable (Distribution)
 import Language.Haskell.TH (Q, runIO)
-import Language.Haskell.TH.Datatype (DatatypeInfo)
 import Language.Haskell.TH.Syntax (
   Body (NormalB),
   Clause (Clause),
@@ -27,7 +27,7 @@ import Language.Haskell.TH.Syntax (
   Phases (AllPhases),
   Pragma (InlineP),
   RuleMatch (FunLike),
-  Type (AppT, ConT),
+  Type (AppT, ConT, ListT),
   mkName,
  )
 
@@ -39,11 +39,11 @@ import Language.Haskell.TH.Datatype (
 
 sysDistributions ::
   System ->
-  Map Name DatatypeInfo ->
-  IO (Map Name (Distribution a))
+  Types ->
+  IO (Distributions a)
 sysDistributions sys types = do
   spec <- paganiniSpecIO sys types
-  return $ case spec of
+  pure $ case spec of
     Left err -> error (show err)
     Right x -> x
 
@@ -56,8 +56,8 @@ hasAdmissibleFrequencies sys = do
 
 constructorNames :: System -> Q (Set Name)
 constructorNames sys = do
-  types <- collectTypes sys
-  foldMap constructorNames' (Map.keysSet types)
+  Types regTypes _ <- collectTypes sys
+  foldMap constructorNames' (Map.keysSet regTypes)
 
 constructorNames' :: Name -> Q (Set Name)
 constructorNames' typ = do
@@ -70,9 +70,9 @@ mkSamplable sys = do
   void $ hasAdmissibleFrequencies sys
 
   types <- collectTypes sys
-  distrMap <- runIO $ sysDistributions sys types
+  Distributions regTypeDdgs listTypeDdgs <- runIO $ sysDistributions sys types
 
-  forM (Map.toList distrMap) $ \(typ, d) -> do
+  ts <- forM (Map.toList regTypeDdgs) $ \(typ, d) -> do
     distribution <- [|d|]
     let cls = AppT (ConT $ mkName "Samplable") (ConT typ)
         constrName = mkName "constrDistribution"
@@ -83,3 +83,17 @@ mkSamplable sys = do
             [Clause [] (NormalB distribution) []]
         , PragmaD $ InlineP constrName Inline FunLike AllPhases
         ]
+
+  ls <- forM (Map.toList listTypeDdgs) $ \(typ, d) -> do
+    distribution <- [|d|]
+    let cls = AppT (ConT $ mkName "Samplable") (AppT ListT $ ConT typ)
+        constrName = mkName "constrDistribution"
+    pure $
+      InstanceD Nothing [] cls $
+        [ FunD
+            constrName
+            [Clause [] (NormalB distribution) []]
+        , PragmaD $ InlineP constrName Inline FunLike AllPhases
+        ]
+
+  pure $ ts <> ls

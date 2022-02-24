@@ -15,6 +15,7 @@ import Data.Boltzmann.Samplable (Samplable (constrDistribution), choice)
 import Data.Boltzmann.Sampler (sample)
 import Data.Boltzmann.System (
   System,
+  Types (..),
   collectTypes,
   getWeight,
  )
@@ -196,8 +197,8 @@ mkBoltzmannSampler' sys typ = do
 
 mkBoltzmannSampler :: System -> Q [Dec]
 mkBoltzmannSampler sys = do
-  types <- collectTypes sys
-  decls <- forM (Map.toList types) $ \(typ, _) -> do
+  Types regTypes _ <- collectTypes sys
+  decls <- forM (Map.toList regTypes) $ \(typ, _) -> do
     mkBoltzmannSampler' sys typ
 
   pure $ concat decls

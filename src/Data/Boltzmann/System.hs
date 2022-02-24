@@ -1,18 +1,21 @@
 module Data.Boltzmann.System (
+  Types (..),
+  Distributions (..),
   collectTypes,
   System (..),
   getWeight,
   paganiniSpecIO,
 ) where
 
-import Language.Haskell.TH.Syntax (Name, Type (ConT))
+import Language.Haskell.TH.Syntax (Name, Type (AppT, ConT, ListT))
 
-import Control.Monad (foldM, replicateM)
+import Control.Monad (foldM, forM, replicateM)
 import Data.Boltzmann.Samplable (Distribution (Distribution))
 import qualified Data.Map as Map
 import Data.Map.Strict (Map)
 import Data.Maybe (fromJust, fromMaybe)
 import Data.Paganini (
+  Def (Def),
   Expr,
   FromVariable,
   Let (Let),
@@ -20,6 +23,7 @@ import Data.Paganini (
   Spec,
   ddg,
   debugPaganini,
+  seq,
   tune,
   variable,
   variable',
@@ -35,6 +39,8 @@ import Language.Haskell.TH.Datatype (
   reifyDatatype,
  )
 
+import Prelude hiding (seq)
+
 data System = System
   { targetType :: Name
   , meanSize :: Int
@@ -47,34 +53,50 @@ getWeight :: System -> Name -> Int
 getWeight sys name =
   fromMaybe 1 $ lookup name (weights sys)
 
-collectTypes :: System -> Q (Map Name DatatypeInfo)
+data Types = Types
+  { regTypes :: Map Name DatatypeInfo
+  , listTypes :: Set Name
+  }
+
+initTypes :: Types
+initTypes = Types Map.empty Set.empty
+
+collectTypes :: System -> Q Types
 collectTypes sys = do
   info <- reifyDatatype $ targetType sys
-  collectFromDataTypeInfo Map.empty info
+  collectFromDataTypeInfo initTypes info
 
 collectFromDataTypeInfo ::
-  Map Name DatatypeInfo ->
+  Types ->
   DatatypeInfo ->
-  Q (Map Name DatatypeInfo)
+  Q Types
 collectFromDataTypeInfo types info =
-  case name `Map.lookup` types of
+  case name `Map.lookup` (regTypes types) of
     Just _ -> pure types
     Nothing -> foldM collectTypesFromCons types' (datatypeCons info)
   where
-    types' = Map.insert name info types
+    types' = types {regTypes = regTypes'}
+    regTypes' = Map.insert name info (regTypes types)
     name = datatypeName info
 
 collectTypesFromCons ::
-  Map Name DatatypeInfo ->
+  Types ->
   ConstructorInfo ->
-  Q (Map Name DatatypeInfo)
+  Q Types
 collectTypesFromCons types consInfo =
   foldM collectFromType types (constructorFields consInfo)
 
-collectFromType :: Map Name DatatypeInfo -> Type -> Q (Map Name DatatypeInfo)
+collectFromType :: Types -> Type -> Q Types
 collectFromType types typ =
   case typ of
     ConT t -> reifyDatatype t >>= collectFromDataTypeInfo types
+    AppT ListT (ConT t) -> do
+      info <- reifyDatatype t
+
+      let types' = types {listTypes = listTypes'}
+          listTypes' = Set.insert (datatypeName info) (listTypes types)
+
+      collectFromDataTypeInfo types' info
     _ -> fail $ "Unsupported type " ++ show typ
 
 mkVariables :: Set Name -> Spec (Map Name Let)
@@ -83,6 +105,15 @@ mkVariables sys = do
   xs <- replicateM n variable
   let sys' = Set.toList sys
   pure (Map.fromList $ sys' `zip` xs)
+
+mkListVariables :: Set Name -> Map Name Let -> Spec (Map Name Def)
+mkListVariables listTypes varDefs = do
+  ps <- forM (Set.toList listTypes) $ \lt -> do
+    let (Let v) = varDefs Map.! lt
+    s <- seq v
+    pure (lt, s)
+
+  pure $ Map.fromList ps
 
 mkMarkingVariables :: System -> Spec (Map Name Let)
 mkMarkingVariables sys = do
@@ -99,6 +130,7 @@ mkMarkingVariables sys = do
 data Params = Params
   { sizeVar :: forall a. FromVariable a => a
   , typeVariable :: Map Name Let
+  , listVariable :: Map Name Def
   , markingVariable :: Map Name Let
   , system :: System
   }
@@ -131,44 +163,57 @@ argExpr :: Params -> Type -> Expr
 argExpr params typ =
   case typ of
     ConT t -> let Let x = typeVariable params Map.! t in x
+    AppT ListT (ConT t) -> let Def x = listVariable params Map.! t in x
     _ -> error $ "Absurd type " ++ show typ
 
 defaults :: (Num p, FromVariable p) => Maybe Let -> p
 defaults Nothing = 1
 defaults (Just (Let x)) = x
 
-mkDidtributions :: Params -> Spec (Map Name (Distribution a))
-mkDidtributions params = do
-  let typeList = Map.toList $ typeVariable params
-  ddgs <-
-    mapM
-      ( \(n, x) -> do
-          ddgTree <- ddg x
-          return (n, Distribution $ fromList $ fromJust ddgTree)
-      )
-      typeList
+data Distributions a = Distributions
+  { regTypeDdgs :: Map Name (Distribution a)
+  , listTypeDdgs :: Map Name (Distribution a)
+  }
 
-  return $ Map.fromList ddgs
+mkDidtributions :: Params -> Spec (Distributions a)
+mkDidtributions params = do
+  let mkDistribution = Distribution . fromList . fromJust
+
+  regDdgs <- forM (Map.toList $ typeVariable params) $ \(name, v) -> do
+    ddgTree <- ddg v
+    pure (name, mkDistribution ddgTree)
+
+  listDdgs <- forM (Map.toList $ listVariable params) $ \(name, v) -> do
+    ddgTree <- ddg v
+    pure (name, mkDistribution ddgTree)
+
+  pure $
+    Distributions
+      { regTypeDdgs = Map.fromList regDdgs
+      , listTypeDdgs = Map.fromList listDdgs
+      }
 
 paganiniSpec ::
   System ->
-  Map Name DatatypeInfo ->
-  Spec (Map Name (Distribution a))
-paganiniSpec sys types = do
+  Types ->
+  Spec (Distributions a)
+paganiniSpec sys (Types regTypes listTypes) = do
   let n = meanSize sys
   Let z <- variable' $ fromIntegral n
-  varDefs <- mkVariables (Map.keysSet types)
+  varDefs <- mkVariables (Map.keysSet regTypes)
+  listDefs <- mkListVariables listTypes varDefs
   markDefs <- mkMarkingVariables sys
 
   let params =
         Params
           { sizeVar = z
           , typeVariable = varDefs
+          , listVariable = listDefs
           , markingVariable = markDefs
           , system = sys
           }
 
-  mkTypeVariables params types
+  mkTypeVariables params regTypes
   let (Let t) = varDefs Map.! targetType sys
 
   tune t -- tune for target variable.
@@ -176,6 +221,6 @@ paganiniSpec sys types = do
 
 paganiniSpecIO ::
   System ->
-  Map Name DatatypeInfo ->
-  IO (Either PaganiniError (Map Name (Distribution a)))
+  Types ->
+  IO (Either PaganiniError (Distributions a))
 paganiniSpecIO sys types = debugPaganini $ paganiniSpec sys types
