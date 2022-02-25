@@ -37,13 +37,17 @@ import Language.Haskell.TH.Lift (lift)
 import Language.Haskell.TH.Syntax (
   Body (NormalB),
   Clause (Clause),
-  Dec (FunD, InstanceD),
+  Dec (FunD, InstanceD, PragmaD),
   Exp (AppE, ConE, InfixE, LamE, LitE, SigE, VarE),
+  Inline (Inlinable),
   Lit (IntegerL),
   Match (Match),
   Name,
   Pat (BangP, LitP, TupP),
+  Phases (AllPhases),
+  Pragma (InlineP),
   Q,
+  RuleMatch (FunLike),
   Stmt (BindS),
   Type (AppT, ConT),
   mkName,
@@ -192,7 +196,8 @@ mkBoltzmannSampler' sys typ = do
   samplerBody <- gen sys typ
   let clazz = AppT (ConT $ mkName "BoltzmannSampler") (ConT typ)
       funDec = FunD (mkName "sample") [Clause [] (NormalB samplerBody) []]
-      inst = InstanceD Nothing [] clazz [funDec]
+      pragma = PragmaD $ InlineP (mkName "sample") Inlinable FunLike AllPhases
+      inst = InstanceD Nothing [] clazz [pragma, funDec]
   return [inst]
 
 mkBoltzmannSampler :: System -> Q [Dec]
