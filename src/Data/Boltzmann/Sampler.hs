@@ -30,7 +30,7 @@ class BoltzmannSampler a where
 instance (Samplable [a], BoltzmannSampler a) => BoltzmannSampler [a] where
   sample !ub = do
     guard (ub > 0)
-    (lift $ choice (constrDistribution :: Distribution [a]))
+    (lift $ choice (distribution :: Distribution [a]))
       >>= ( \case
              0 -> pure ([], 0)
              _ -> do

@@ -22,8 +22,12 @@ import Language.Haskell.TH.Syntax (
   Body (NormalB),
   Clause (Clause),
   Dec (FunD, InstanceD, PragmaD),
+  Exp (LamCaseE, LitE),
   Inline (Inline),
+  Lit (IntegerL),
+  Match (Match),
   Name,
+  Pat (ConP, WildP),
   Phases (AllPhases),
   Pragma (InlineP),
   RuleMatch (FunLike),
@@ -32,10 +36,56 @@ import Language.Haskell.TH.Syntax (
  )
 
 import Language.Haskell.TH.Datatype (
-  ConstructorInfo (constructorName),
+  ConstructorInfo (constructorFields, constructorName),
   DatatypeInfo (datatypeCons),
   reifyDatatype,
  )
+
+mkWeight :: DatatypeInfo -> [(Name, Int)] -> Q [Dec]
+mkWeight info dict = do
+  matches <- forM (datatypeCons info) $ \con -> do
+    let name = constructorName con
+    case lookup name dict of
+      Nothing -> fail $ "No weight for constructor " ++ show name
+      Just w -> pure $ constrMatch con w
+
+  let funDec =
+        FunD
+          weightName
+          [Clause [] (NormalB $ LamCaseE matches) []]
+
+      weightName = mkName "weight"
+
+      pragma = PragmaD $ InlineP weightName Inline FunLike AllPhases
+
+  pure [pragma, funDec]
+
+mkConstWeight :: Integer -> Q [Dec]
+mkConstWeight n = pure [pragma, funDec]
+  where
+    funDec =
+      FunD
+        weightName
+        [Clause [] (NormalB $ LamCaseE matches) []]
+
+    weightName = mkName "weight"
+
+    matches = [Match WildP (NormalB $ LitE (IntegerL n)) []]
+    pragma = PragmaD $ InlineP weightName Inline FunLike AllPhases
+
+constrMatch :: ConstructorInfo -> Int -> Match
+constrMatch constrInfo w =
+  Match pat (NormalB rhs) []
+  where
+    pat = constrPat constrInfo
+    rhs = LitE $ IntegerL (fromIntegral w)
+
+constrPat :: ConstructorInfo -> Pat
+constrPat info =
+  ConP name $ map (const WildP) args
+  where
+    name = constructorName info
+    args = constructorFields info
 
 sysDistributions ::
   System ->
@@ -69,13 +119,17 @@ mkSamplable :: System -> Q [Dec]
 mkSamplable sys = do
   void $ hasAdmissibleFrequencies sys
 
-  types <- collectTypes sys
+  types@(Types regTypes _) <- collectTypes sys
   Distributions regTypeDdgs listTypeDdgs <- runIO $ sysDistributions sys types
 
   ts <- forM (Map.toList regTypeDdgs) $ \(typ, d) -> do
-    distribution <- [|d|]
     let cls = AppT (ConT $ mkName "Samplable") (ConT typ)
-        constrName = mkName "constrDistribution"
+        constrName = mkName "distribution"
+        info = regTypes Map.! typ
+
+    distribution <- [|d|]
+    weight <- mkWeight info (weights sys)
+
     pure $
       InstanceD Nothing [] cls $
         [ FunD
@@ -83,11 +137,15 @@ mkSamplable sys = do
             [Clause [] (NormalB distribution) []]
         , PragmaD $ InlineP constrName Inline FunLike AllPhases
         ]
+          <> weight
 
   ls <- forM (Map.toList listTypeDdgs) $ \(typ, d) -> do
-    distribution <- [|d|]
     let cls = AppT (ConT $ mkName "Samplable") (AppT ListT $ ConT typ)
-        constrName = mkName "constrDistribution"
+        constrName = mkName "distribution"
+
+    distribution <- [|d|]
+    weight <- mkConstWeight 0
+
     pure $
       InstanceD Nothing [] cls $
         [ FunD
@@ -95,5 +153,6 @@ mkSamplable sys = do
             [Clause [] (NormalB distribution) []]
         , PragmaD $ InlineP constrName Inline FunLike AllPhases
         ]
+          <> weight
 
   pure $ ts <> ls

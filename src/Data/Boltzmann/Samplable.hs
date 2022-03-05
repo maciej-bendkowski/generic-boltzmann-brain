@@ -14,7 +14,8 @@ import System.Random.SplitMix (SMGen)
 import Prelude hiding (null)
 
 class Samplable a where
-  constrDistribution :: Distribution a
+  distribution :: Distribution a
+  weight :: a -> Int
 
 newtype Distribution a = Distribution {unDistribution :: Vector Int}
 deriveLift ''Distribution

@@ -11,13 +11,12 @@ module Data.Boltzmann.Sampler.TH (mkBoltzmannSampler) where
 
 import Control.Monad (forM, guard)
 import qualified Control.Monad.Trans as T
-import Data.Boltzmann.Samplable (Samplable (constrDistribution), choice)
+import Data.Boltzmann.Samplable (Samplable (distribution), choice)
 import Data.Boltzmann.Sampler (sample)
 import Data.Boltzmann.System (
   System,
   Types (..),
   collectTypes,
-  getWeight,
  )
 import qualified Data.Map as Map
 import Language.Haskell.TH (
@@ -33,7 +32,6 @@ import Language.Haskell.TH.Datatype (
   constructorName,
   reifyDatatype,
  )
-import Language.Haskell.TH.Lift (lift)
 import Language.Haskell.TH.Syntax (
   Body (NormalB),
   Clause (Clause),
@@ -81,32 +79,39 @@ fresh s = do
   x <- newName s
   return (VarP x, VarE x)
 
+-- note: we're using fully qualified constructors
 constructor :: Name -> Q Exp
-constructor = return . ConE . mkName . show -- note: we're using fully qualified constructors
+constructor = return . ConE . mkName . show
 
-weightQuery :: System -> ConstructorInfo -> Q Exp
-weightQuery sys con = lift (sys `getWeight` name)
+constrExp :: ConstructorInfo -> Q Exp
+constrExp info = do
+  undef <- [|undefined|]
+  pure $ foldl AppE (ConE name) $ map (const undef) args
   where
-    name = constructorName con
+    name = constructorName info
+    args = constructorFields info
 
-genMatchExprs :: System -> [(ConstructorInfo, Integer)] -> Q Exp
-genMatchExprs sys constrGroup = do
-  matchExprs <- mapM (genMatchExpr sys) constrGroup
+weightQuery :: ConstructorInfo -> Q Exp
+weightQuery con = [|weight $(constrExp con)|]
+
+genMatchExprs :: [(ConstructorInfo, Integer)] -> Q Exp
+genMatchExprs constrGroup = do
+  matchExprs <- mapM genMatchExpr constrGroup
   return $ LamCaseE matchExprs
 
-genMatchExpr :: System -> (ConstructorInfo, Integer) -> Q Match
-genMatchExpr sys (con, n) = do
+genMatchExpr :: (ConstructorInfo, Integer) -> Q Match
+genMatchExpr (con, n) = do
   let n' = LitP $ IntegerL n
-  conExpr <- genConExpr sys con
+  conExpr <- genConExpr con
   return $ Match n' (NormalB conExpr) []
 
-genConExpr :: System -> ConstructorInfo -> Q Exp
-genConExpr sys con = do
-  argStmtExpr <- genArgExprs sys con
+genConExpr :: ConstructorInfo -> Q Exp
+genConExpr con = do
+  argStmtExpr <- genArgExprs con
   case asStmts argStmtExpr of
-    [] -> [|pure ($(constructor (constructorName con)), $(weightQuery sys con))|]
+    [] -> [|pure ($(constructor (constructorName con)), $(weightQuery con))|]
     _ -> do
-      w <- weightQuery sys con
+      w <- weightQuery con
       constrApp <- genConstrApplication (constructorName con) (asObjs argStmtExpr)
       weightSum <- sum w (asWeights argStmtExpr)
       pure' <- [|pure|]
@@ -128,9 +133,9 @@ data ArgStmtExpr = ArgStmtExpr
   , asWeights :: [Exp]
   }
 
-genArgExprs :: System -> ConstructorInfo -> Q ArgStmtExpr
-genArgExprs sys con = do
-  w <- weightQuery sys con
+genArgExprs :: ConstructorInfo -> Q ArgStmtExpr
+genArgExprs con = do
+  w <- weightQuery con
   ubExpr <- var "ub" `minus` [w]
   genArgExprs' ubExpr (constructorFields con)
 
@@ -154,7 +159,7 @@ genChoiceExpr :: Name -> Q Exp
 genChoiceExpr typ = do
   choice' <- [|choice|]
   lift' <- [|T.lift|]
-  ddgs' <- [|constrDistribution|]
+  ddgs' <- [|distribution|]
   let typ' = SigE ddgs' $ AppT (ConT $ mkName "Distribution") (ConT typ)
   return $ foldr AppE typ' [lift', choice']
 
@@ -166,13 +171,13 @@ genGuardExpr = do
   guardExpr <- [|guard|]
   return $ AppE guardExpr compExpr
 
-gen :: System -> Name -> Q Exp
-gen sys typ = do
+gen :: Name -> Q Exp
+gen typ = do
   guardExpr <- genGuardExpr
   choiceExpr <- genChoiceExpr typ
 
   constrGroup <- genConstrGroup typ
-  caseExpr <- genMatchExprs sys constrGroup
+  caseExpr <- genMatchExprs constrGroup
   bindOp <- [|(>>=)|]
 
   return $
@@ -191,9 +196,9 @@ genConstrGroup typ = do
   return $ zip consInfo [0 :: Integer ..]
 
 -- | Given a type name `a`, instantiates it as `BoltzmannSampler` of `a`.
-mkBoltzmannSampler' :: System -> Name -> Q [Dec]
-mkBoltzmannSampler' sys typ = do
-  samplerBody <- gen sys typ
+mkBoltzmannSampler' :: Name -> Q [Dec]
+mkBoltzmannSampler' typ = do
+  samplerBody <- gen typ
   let clazz = AppT (ConT $ mkName "BoltzmannSampler") (ConT typ)
       funDec = FunD (mkName "sample") [Clause [] (NormalB samplerBody) []]
       pragma = PragmaD $ InlineP (mkName "sample") Inlinable FunLike AllPhases
@@ -204,6 +209,6 @@ mkBoltzmannSampler :: System -> Q [Dec]
 mkBoltzmannSampler sys = do
   Types regTypes _ <- collectTypes sys
   decls <- forM (Map.toList regTypes) $ \(typ, _) -> do
-    mkBoltzmannSampler' sys typ
+    mkBoltzmannSampler' typ
 
   pure $ concat decls
