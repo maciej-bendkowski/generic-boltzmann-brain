@@ -6,7 +6,10 @@ import Control.Monad (replicateM)
 import Data.Boltzmann.Samplable (Distribution (..), Samplable (..))
 import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
 import Data.Boltzmann.System (System (..))
-import Data.Boltzmann.System.TH (mkSystemBoltzmannSampler)
+import Data.Boltzmann.System.TH (
+  mkNewtypeSystemBoltzmannSampler,
+  mkSystemBoltzmannSampler,
+ )
 import Data.BuffonMachine (evalIO)
 import System.Random.SplitMix (SMGen)
 
@@ -26,3 +29,16 @@ mkSystemBoltzmannSampler
 randomTreeListIO :: Int -> IO [Tree]
 randomTreeListIO n =
   evalIO $ replicateM n (rejectionSampler' @SMGen 1000 0.2)
+
+newtype Tree' = MkTree' Tree
+  deriving (Show)
+
+mkNewtypeSystemBoltzmannSampler
+  System
+    { targetType = ''Tree'
+    , meanSize = 2000
+    , frequencies = []
+    , weights =
+        [ ('T, 1)
+        ]
+    }

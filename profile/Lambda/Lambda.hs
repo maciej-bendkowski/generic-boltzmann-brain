@@ -6,7 +6,7 @@ import Control.Monad (replicateM)
 import Data.Boltzmann.Samplable (Distribution (..), Samplable (..))
 import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
 import Data.Boltzmann.System (System (..))
-import Data.Boltzmann.System.TH (mkSystemBoltzmannSampler)
+import Data.Boltzmann.System.TH (mkNewtypeSystemBoltzmannSampler, mkSystemBoltzmannSampler)
 import Data.BuffonMachine (evalIO)
 import System.Random.SplitMix (SMGen)
 
@@ -37,6 +37,24 @@ mkSystemBoltzmannSampler
         ]
     }
 
-randomLambdaListIO :: Int -> IO [Lambda]
-randomLambdaListIO n =
-  evalIO $ replicateM n (rejectionSampler' @SMGen 10_000 0.2)
+newtype BinLambda = MkBinLambda Lambda
+  deriving (Show)
+
+mkNewtypeSystemBoltzmannSampler
+  System
+    { targetType = ''BinLambda
+    , meanSize = 12_000
+    , frequencies = []
+    , weights =
+        [ -- De Bruijn
+          ('S, 1)
+        , ('Z, 1)
+        , -- Lambda
+          ('Index, 0)
+        , ('App, 2)
+        , ('Abs, 2)
+        ]
+    }
+
+randomLambdaListIO :: Int -> IO [BinLambda]
+randomLambdaListIO n = evalIO $ replicateM n (rejectionSampler' @SMGen 10_000 0.2)

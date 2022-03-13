@@ -11,7 +11,10 @@ module Data.Boltzmann.Sampler.TH (mkBoltzmannSampler) where
 
 import Control.Monad (forM, guard)
 import qualified Control.Monad.Trans as T
+import Data.Coerce (coerce)
+
 import Data.Boltzmann.Samplable (Samplable (distribution), choice)
+import Data.Boltzmann.Samplable.TH (SynonymResolver, synonym, typeSynonym)
 import Data.Boltzmann.Sampler (sample)
 import Data.Boltzmann.System (
   System,
@@ -36,7 +39,7 @@ import Language.Haskell.TH.Syntax (
   Body (NormalB),
   Clause (Clause),
   Dec (FunD, InstanceD, PragmaD),
-  Exp (AppE, ConE, InfixE, LamE, LitE, SigE, VarE),
+  Exp (AppE, AppTypeE, ConE, InfixE, LamE, LitE, SigE, VarE),
   Inline (Inlinable),
   Lit (IntegerL),
   Match (Match),
@@ -47,7 +50,7 @@ import Language.Haskell.TH.Syntax (
   Q,
   RuleMatch (FunLike),
   Stmt (BindS),
-  Type (AppT, ConT),
+  Type (AppT, ArrowT, ConT),
   mkName,
  )
 import Prelude hiding (sum)
@@ -91,41 +94,77 @@ constrExp info = do
     name = constructorName info
     args = constructorFields info
 
-weightQuery :: ConstructorInfo -> Q Exp
-weightQuery con = [|weight $(constrExp con)|]
+weightQuery :: Name -> SynonymResolver -> ConstructorInfo -> Q Exp
+weightQuery typ resolver con = do
+  typSyn <- resolver `synonym` typ
+  coerceExp <- [|coerce|]
+  let coerceExp' = AppTypeE coerceExp (ConT typ)
+      coerceExp'' = AppTypeE coerceExp' (ConT typSyn)
 
-genMatchExprs :: [(ConstructorInfo, Integer)] -> Q Exp
-genMatchExprs constrGroup = do
-  matchExprs <- mapM genMatchExpr constrGroup
+  conExp <- constrExp con
+  weightExp <- [|weight|]
+  pure $ AppE weightExp (AppE coerceExp'' conExp)
+
+genConsCoerce :: Name -> SynonymResolver -> ConstructorInfo -> Q Exp
+genConsCoerce typ resolver con = do
+  syns <- mapM (typeSynonym resolver) (constructorFields con)
+
+  coerceExp <- [|coerce|]
+  typSyn <- resolver `synonym` typ
+
+  let currTyp = foldr (\x y -> AppT (AppT ArrowT x) y) (ConT typ) (constructorFields con)
+      coerceTyp = foldr (\x y -> AppT (AppT ArrowT x) y) (ConT typSyn) syns
+
+  pure $ AppTypeE (AppTypeE coerceExp currTyp) coerceTyp
+
+genMatchExprs :: Name -> SynonymResolver -> [(ConstructorInfo, Integer)] -> Q Exp
+genMatchExprs typ resolver constrGroup = do
+  matchExprs <- mapM (genMatchExpr typ resolver) constrGroup
   return $ LamCaseE matchExprs
 
-genMatchExpr :: (ConstructorInfo, Integer) -> Q Match
-genMatchExpr (con, n) = do
+genMatchExpr :: Name -> SynonymResolver -> (ConstructorInfo, Integer) -> Q Match
+genMatchExpr typ resolver (con, n) = do
   let n' = LitP $ IntegerL n
-  conExpr <- genConExpr con
+  conExpr <- genConExpr typ resolver con
   return $ Match n' (NormalB conExpr) []
 
-genConExpr :: ConstructorInfo -> Q Exp
-genConExpr con = do
-  argStmtExpr <- genArgExprs con
+genConExpr :: Name -> SynonymResolver -> ConstructorInfo -> Q Exp
+genConExpr typ resolver con = do
+  argStmtExpr <- genArgExprs typ resolver con
   case asStmts argStmtExpr of
-    [] -> [|pure ($(constructor (constructorName con)), $(weightQuery con))|]
+    [] ->
+      [|
+        pure
+          ( $(genConsCoerce typ resolver con)
+              $(constructor (constructorName con))
+          , $(weightQuery typ resolver con)
+          )
+        |]
     _ -> do
-      w <- weightQuery con
-      constrApp <- genConstrApplication (constructorName con) (asObjs argStmtExpr)
+      w <- weightQuery typ resolver con
+      coerceExp <- genConsCoerce typ resolver con
+      constrApp <- genConstrApplication coerceExp (constructorName con) (asObjs argStmtExpr)
       weightSum <- sum w (asWeights argStmtExpr)
       pure' <- [|pure|]
       return $
         DoE
           Nothing
           ( asStmts argStmtExpr
-              ++ [NoBindS $ AppE pure' (TupE [Just constrApp, Just weightSum])]
+              ++ [ NoBindS $
+                    AppE
+                      pure'
+                      ( TupE
+                          [ Just constrApp
+                          , Just weightSum
+                          ]
+                      )
+                 ]
           )
 
-genConstrApplication :: Name -> [Exp] -> Q Exp
-genConstrApplication s args' = do
+genConstrApplication :: Exp -> Name -> [Exp] -> Q Exp
+genConstrApplication coerceExp s args' = do
   con <- constructor s
-  return $ foldl AppE con args'
+  return $ foldl AppE (AppE coerceExp con) args'
 
 data ArgStmtExpr = ArgStmtExpr
   { asStmts :: [Stmt]
@@ -133,21 +172,30 @@ data ArgStmtExpr = ArgStmtExpr
   , asWeights :: [Exp]
   }
 
-genArgExprs :: ConstructorInfo -> Q ArgStmtExpr
-genArgExprs con = do
-  w <- weightQuery con
+genArgExprs :: Name -> SynonymResolver -> ConstructorInfo -> Q ArgStmtExpr
+genArgExprs typ resolver con = do
+  w <- weightQuery typ resolver con
   ubExpr <- var "ub" `minus` [w]
-  genArgExprs' ubExpr (constructorFields con)
+  genArgExprs' resolver ubExpr (constructorFields con)
 
-genArgExprs' :: Exp -> [Type] -> Q ArgStmtExpr
-genArgExprs' _ [] = return ArgStmtExpr {asStmts = [], asObjs = [], asWeights = []}
-genArgExprs' ubExpr (_ : as) = do
+genArgExprs' :: SynonymResolver -> Exp -> [Type] -> Q ArgStmtExpr
+genArgExprs' _ _ [] =
+  pure
+    ArgStmtExpr
+      { asStmts = []
+      , asObjs = []
+      , asWeights = []
+      }
+genArgExprs' resolver ubExpr (typ : as) = do
   (xp, x) <- fresh "x"
   (wp, w) <- fresh "w"
+
   argExpr <- [|sample|]
+  typSyn <- resolver `typeSynonym` typ
+
   ubExpr' <- ubExpr `minus` [w]
-  argStmtExpr <- genArgExprs' ubExpr' as
-  let stmt = BindS (TupP [xp, wp]) (AppE argExpr ubExpr)
+  argStmtExpr <- genArgExprs' resolver ubExpr' as
+  let stmt = BindS (TupP [xp, wp]) (AppE (AppTypeE argExpr typSyn) ubExpr)
   return
     ArgStmtExpr
       { asStmts = stmt : asStmts argStmtExpr
@@ -155,12 +203,18 @@ genArgExprs' ubExpr (_ : as) = do
       , asWeights = w : asWeights argStmtExpr
       }
 
-genChoiceExpr :: Name -> Q Exp
-genChoiceExpr typ = do
+genChoiceExpr :: SynonymResolver -> Name -> Q Exp
+genChoiceExpr resolver typ = do
   choice' <- [|choice|]
   lift' <- [|T.lift|]
   ddgs' <- [|distribution|]
-  let typ' = SigE ddgs' $ AppT (ConT $ mkName "Distribution") (ConT typ)
+  typSyn <- resolver `synonym` typ
+
+  let typ' =
+        SigE ddgs' $
+          AppT
+            (ConT $ mkName "Distribution")
+            (ConT typSyn)
   return $ foldr AppE typ' [lift', choice']
 
 genGuardExpr :: Q Exp
@@ -171,13 +225,13 @@ genGuardExpr = do
   guardExpr <- [|guard|]
   return $ AppE guardExpr compExpr
 
-gen :: Name -> Q Exp
-gen typ = do
+gen :: SynonymResolver -> Name -> Q Exp
+gen resolver typ = do
   guardExpr <- genGuardExpr
-  choiceExpr <- genChoiceExpr typ
+  choiceExpr <- genChoiceExpr resolver typ
 
   constrGroup <- genConstrGroup typ
-  caseExpr <- genMatchExprs constrGroup
+  caseExpr <- genMatchExprs typ resolver constrGroup
   bindOp <- [|(>>=)|]
 
   return $
@@ -196,19 +250,20 @@ genConstrGroup typ = do
   return $ zip consInfo [0 :: Integer ..]
 
 -- | Given a type name `a`, instantiates it as `BoltzmannSampler` of `a`.
-mkBoltzmannSampler' :: Name -> Q [Dec]
-mkBoltzmannSampler' typ = do
-  samplerBody <- gen typ
-  let clazz = AppT (ConT $ mkName "BoltzmannSampler") (ConT typ)
+mkBoltzmannSampler' :: SynonymResolver -> Name -> Q [Dec]
+mkBoltzmannSampler' resolver typ = do
+  samplerBody <- gen resolver typ
+  typSyn <- resolver `synonym` typ
+  let clazz = AppT (ConT $ mkName "BoltzmannSampler") (ConT typSyn)
       funDec = FunD (mkName "sample") [Clause [] (NormalB samplerBody) []]
       pragma = PragmaD $ InlineP (mkName "sample") Inlinable FunLike AllPhases
       inst = InstanceD Nothing [] clazz [pragma, funDec]
   return [inst]
 
-mkBoltzmannSampler :: System -> Q [Dec]
-mkBoltzmannSampler sys = do
+mkBoltzmannSampler :: SynonymResolver -> System -> Q [Dec]
+mkBoltzmannSampler resolver sys = do
   Types regTypes _ <- collectTypes sys
   decls <- forM (Map.toList regTypes) $ \(typ, _) -> do
-    mkBoltzmannSampler' typ
+    mkBoltzmannSampler' resolver typ
 
   pure $ concat decls

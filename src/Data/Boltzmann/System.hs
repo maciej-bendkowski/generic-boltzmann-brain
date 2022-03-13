@@ -2,6 +2,7 @@ module Data.Boltzmann.System (
   Types (..),
   Distributions (..),
   collectTypes,
+  reachableTypes,
   System (..),
   getWeight,
   paganiniSpecIO,
@@ -57,9 +58,19 @@ data Types = Types
   { regTypes :: Map Name DatatypeInfo
   , listTypes :: Set Name
   }
+  deriving (Show)
 
 initTypes :: Types
 initTypes = Types Map.empty Set.empty
+
+reachableTypes :: System -> Q Types
+reachableTypes sys = do
+  types <- collectTypes sys
+  pure $
+    Types
+      { regTypes = targetType sys `Map.delete` regTypes types
+      , listTypes = targetType sys `Set.delete` listTypes types
+      }
 
 collectTypes :: System -> Q Types
 collectTypes sys = do
