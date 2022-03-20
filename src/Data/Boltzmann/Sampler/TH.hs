@@ -1,6 +1,17 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-module Data.Boltzmann.Sampler.TH where
+module Data.Boltzmann.Sampler.TH (
+  ConstructorName (..),
+  Synonym (..),
+  SynonymResolver (..),
+  TypeDistributions (..),
+  ListTypeDistributions (..),
+  TypeName (..),
+  WeightResolver (..),
+  SamplerCtx (..),
+  mkSystemCtx,
+  targetTypeSynonym,
+) where
 
 import Data.Coerce (coerce)
 
