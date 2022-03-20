@@ -28,9 +28,9 @@ library
   exposed-modules:
       Data.Boltzmann.Samplable
       Data.Boltzmann.Sampler
-      Data.Boltzmann.Sampler.Utils
+      Data.Boltzmann.Sampler.TH
       Data.Boltzmann.System
-      Data.Boltzmann.System.Utils
+      Data.Boltzmann.System.TH
       Data.BuffonMachine
   other-modules:
       Paths_generic_boltzmann_brain

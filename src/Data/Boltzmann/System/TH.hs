@@ -1,7 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Data.Boltzmann.System.Utils (mkBoltzmannSampler) where
+module Data.Boltzmann.System.TH (mkBoltzmannSampler) where
 
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
@@ -10,7 +10,7 @@ import Control.Monad (forM, guard)
 import Control.Monad.Trans (MonadTrans (lift))
 import Control.Monad.Trans.Reader (ReaderT (runReaderT), asks)
 import Data.Boltzmann.Samplable (Distribution, choice)
-import Data.Boltzmann.Sampler.Utils (
+import Data.Boltzmann.Sampler.TH (
   ConstructorName (MkConstructorName),
   ListTypeDistributions (unListTypeDistributions),
   SamplerCtx (

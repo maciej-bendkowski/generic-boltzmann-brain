@@ -5,7 +5,7 @@ module BinTree (BinTree (..), randomBinTreeListIO) where
 import Control.Monad (replicateM)
 import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
 import Data.Boltzmann.System (System (..))
-import Data.Boltzmann.System.Utils (mkBoltzmannSampler)
+import Data.Boltzmann.System.TH (mkBoltzmannSampler)
 import Data.BuffonMachine (evalIO)
 import System.Random.SplitMix (SMGen)
 

@@ -1,6 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-module Data.Boltzmann.Sampler.Utils where
+module Data.Boltzmann.Sampler.TH where
 
 import Data.Coerce (coerce)
 
