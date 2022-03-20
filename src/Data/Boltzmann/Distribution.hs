@@ -5,7 +5,7 @@ module Data.Boltzmann.Distribution (
   choice,
 ) where
 
-import Data.BuffonMachine (Discrete, getBit)
+import Data.Boltzmann.BitOracle (Discrete, getBit)
 import Data.Vector (Vector, null, (!))
 import Language.Haskell.TH.Lift (deriveLift)
 import System.Random (RandomGen, StdGen)

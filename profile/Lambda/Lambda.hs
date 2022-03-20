@@ -7,7 +7,7 @@ import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
 import Data.Boltzmann.System (System (..))
 
 import Data.Boltzmann.System.TH (mkBoltzmannSampler)
-import Data.BuffonMachine (evalIO)
+import Data.Boltzmann.BitOracle (evalIO)
 import System.Random.SplitMix (SMGen)
 
 data DeBruijn

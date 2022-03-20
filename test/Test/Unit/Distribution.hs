@@ -2,7 +2,7 @@ module Test.Unit.Distribution (unitTests) where
 
 import Control.Monad (replicateM)
 import Data.Boltzmann.Distribution (Distribution (..), choice)
-import Data.BuffonMachine (evalIO)
+import Data.Boltzmann.BitOracle (evalIO)
 import qualified Data.Map as Map
 import Data.Vector (fromList)
 import System.Random.SplitMix (SMGen)
@@ -19,7 +19,7 @@ import Test.Tasty.HUnit (
 unitTests :: TestTree
 unitTests =
   testGroup
-    "BuffonMachine unit tests"
+    "BitOracle unit tests"
     [choiceTests]
 
 choiceTests :: TestTree

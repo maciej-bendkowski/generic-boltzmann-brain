@@ -13,7 +13,7 @@ module Data.Boltzmann.Sampler (
 ) where
 
 import Control.Monad.Trans.Maybe (MaybeT, runMaybeT)
-import Data.BuffonMachine (BuffonMachine, eval)
+import Data.Boltzmann.BitOracle (BitOracle, eval)
 import System.Random (RandomGen)
 import Test.QuickCheck (Gen)
 import Test.QuickCheck.Gen (Gen (MkGen))
@@ -21,10 +21,10 @@ import Test.QuickCheck.Random (QCGen (QCGen))
 
 -- | Multiparametric Boltzmann samplers.
 class BoltzmannSampler a where
-  sample :: RandomGen g => Int -> MaybeT (BuffonMachine g) (a, Int)
+  sample :: RandomGen g => Int -> MaybeT (BitOracle g) (a, Int)
 
 rejectionSampler ::
-  (RandomGen g, BoltzmannSampler a) => Int -> Int -> BuffonMachine g a
+  (RandomGen g, BoltzmannSampler a) => Int -> Int -> BitOracle g a
 rejectionSampler lb ub = do
   runMaybeT (sample ub)
     >>= ( \case
@@ -36,7 +36,7 @@ rejectionSampler lb ub = do
         )
 
 rejectionSampler' ::
-  (RandomGen g, BoltzmannSampler a) => Int -> Double -> BuffonMachine g a
+  (RandomGen g, BoltzmannSampler a) => Int -> Double -> BitOracle g a
 rejectionSampler' n eps = rejectionSampler lb ub
   where
     lb = floor $ (1 - eps) * fromIntegral n

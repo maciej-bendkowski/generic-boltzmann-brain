@@ -26,12 +26,12 @@ source-repository head
 
 library
   exposed-modules:
+      Data.Boltzmann.BitOracle
       Data.Boltzmann.Distribution
       Data.Boltzmann.Sampler
       Data.Boltzmann.Sampler.TH
       Data.Boltzmann.System
       Data.Boltzmann.System.TH
-      Data.BuffonMachine
   other-modules:
       Paths_generic_boltzmann_brain
   hs-source-dirs:

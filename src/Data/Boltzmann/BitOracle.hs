@@ -1,16 +1,12 @@
 -- |
--- Module      : Data.BuffonMachine
--- Description : Buffon machines providing random variates for discrete
---               probability distributions.
+-- Module      : Data.Boltzmann.BitOracle
+-- Description :
 -- Copyright   : (c) Maciej Bendkowski, 2022
 -- License     : BSD3
 -- Maintainer  : maciej.bendkowski@gmail.com
 -- Stability   : experimental
---
--- Monad for computations consuming random bits provided by a buffered random
--- bit oracle.
-module Data.BuffonMachine (
-  BuffonMachine,
+module Data.Boltzmann.BitOracle (
+  BitOracle,
   Discrete,
   Oracle (..),
   EvalIO (..),
@@ -64,32 +60,32 @@ regenerate oracle =
 
 -- |
 --  Buffon machines implemented as a `State` monad over `Oracle`.
-newtype BuffonMachine g a = MkBuffonMachine
-  {runBuffonMachine :: State (Oracle g) a}
+newtype BitOracle g a = MkBitOracle
+  {runBitOracle :: State (Oracle g) a}
   deriving (Functor, Applicative, Monad) via State (Oracle g)
 
 class RandomGen g => EvalIO g where
-  evalIO :: BuffonMachine g a -> IO a
+  evalIO :: BitOracle g a -> IO a
 
-type Bern g = BuffonMachine g Bool
+type Bern g = BitOracle g Bool
 
 {-# INLINEABLE getBit #-}
 getBit :: RandomGen g => Bern g
-getBit = MkBuffonMachine $ do
+getBit = MkBitOracle $ do
   modify' regenerate
   oracle <- get
   put $ useBit oracle
   pure $ currentBit oracle
 
 -- |
---  Buffon machine computations resulting in discrete random variables.
-type Discrete g = BuffonMachine g Int
+--  Random computations resulting in discrete random variables.
+type Discrete g = BitOracle g Int
 
 -- |
---  Runs the given Buffon machine computation using the given random generator.
+--  Runs the given random computation using the given random generator.
 {-# INLINEABLE eval #-}
-eval :: RandomGen g => BuffonMachine g a -> g -> a
-eval m g = evalState (runBuffonMachine m) (fresh g)
+eval :: RandomGen g => BitOracle g a -> g -> a
+eval m g = evalState (runBitOracle m) (fresh g)
 
 instance EvalIO SMGen where
   {-# INLINE evalIO #-}
