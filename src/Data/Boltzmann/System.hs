@@ -72,7 +72,7 @@ collectFromDataTypeInfo ::
   DatatypeInfo ->
   Q Types
 collectFromDataTypeInfo types info =
-  case name `Map.lookup` (regTypes types) of
+  case name `Map.lookup` regTypes types of
     Just _ -> pure types
     Nothing -> foldM collectTypesFromCons types' (datatypeCons info)
   where
