@@ -143,7 +143,11 @@ genConExpr typ resolver con = do
     _ -> do
       w <- weightQuery typ resolver con
       coerceExp <- genConsCoerce typ resolver con
-      constrApp <- genConstrApplication coerceExp (constructorName con) (asObjs argStmtExpr)
+      constrApp <-
+        genConstrApplication
+          coerceExp
+          (constructorName con)
+          (asObjs argStmtExpr)
       weightSum <- sum w (asWeights argStmtExpr)
       pure' <- [|pure|]
       return $

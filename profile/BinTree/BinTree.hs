@@ -3,10 +3,9 @@
 module BinTree (BinTree (..), randomBinTreeListIO) where
 
 import Control.Monad (replicateM)
-import Data.Boltzmann.Samplable (Distribution (..), Samplable (..))
 import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
 import Data.Boltzmann.System (System (..))
-import Data.Boltzmann.System.TH (mkSystemBoltzmannSampler)
+import Data.Boltzmann.System.Utils (mkBoltzmannSampler)
 import Data.BuffonMachine (evalIO)
 import System.Random.SplitMix (SMGen)
 
@@ -15,7 +14,7 @@ data BinTree
   | Node BinTree BinTree
   deriving (Show)
 
-mkSystemBoltzmannSampler
+mkBoltzmannSampler
   System
     { targetType = ''BinTree
     , meanSize = 1000

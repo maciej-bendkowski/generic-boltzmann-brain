@@ -18,6 +18,8 @@ class Samplable a where
   weight :: a -> Int
 
 newtype Distribution a = Distribution {unDistribution :: Vector Int}
+  deriving stock (Show)
+
 deriveLift ''Distribution
 
 -- |

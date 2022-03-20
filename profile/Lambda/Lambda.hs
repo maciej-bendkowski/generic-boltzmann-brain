@@ -3,10 +3,10 @@
 module Lambda (Lambda (..), randomLambdaListIO) where
 
 import Control.Monad (replicateM)
-import Data.Boltzmann.Samplable (Distribution (..), Samplable (..))
 import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
 import Data.Boltzmann.System (System (..))
-import Data.Boltzmann.System.TH (mkNewtypeSystemBoltzmannSampler, mkSystemBoltzmannSampler)
+
+import Data.Boltzmann.System.Utils (mkBoltzmannSampler)
 import Data.BuffonMachine (evalIO)
 import System.Random.SplitMix (SMGen)
 
@@ -21,7 +21,7 @@ data Lambda
   | Abs Lambda
   deriving (Show)
 
-mkSystemBoltzmannSampler
+mkBoltzmannSampler
   System
     { targetType = ''Lambda
     , meanSize = 10_000
@@ -40,11 +40,11 @@ mkSystemBoltzmannSampler
 newtype BinLambda = MkBinLambda Lambda
   deriving (Show)
 
-mkNewtypeSystemBoltzmannSampler
+mkBoltzmannSampler
   System
     { targetType = ''BinLambda
-    , meanSize = 12_000
-    , frequencies = []
+    , meanSize = 10_000
+    , frequencies = [('Abs, 4500)]
     , weights =
         [ -- De Bruijn
           ('S, 1)

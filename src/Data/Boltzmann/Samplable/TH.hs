@@ -10,7 +10,7 @@ module Data.Boltzmann.Samplable.TH (
   typeSynonym,
 ) where
 
-import Control.Monad (forM, void)
+import Control.Monad (forM, forM_, unless, void)
 import Data.Boltzmann.System (
   Distributions (..),
   System (..),
@@ -27,8 +27,6 @@ import Data.Coerce (coerce)
 
 import Data.Set (Set)
 import qualified Data.Set as Set
-
-import Control.Monad (forM_, unless)
 import Language.Haskell.TH (Q, runIO)
 import Language.Haskell.TH.Syntax (
   Bang (Bang),
@@ -92,7 +90,9 @@ getConstrs info = do
   dtVariant <- getTypeVariant info
   case dtVariant of
     IsDatatype -> pure $ datatypeCons info
-    IsNewtype _ syn -> reifyDatatype (coerce syn) >>= pure . datatypeCons
+    IsNewtype _ syn -> do
+      info' <- reifyDatatype (coerce syn)
+      pure $ datatypeCons info'
 
 mkWeight :: System -> (DataTypeVariant, DatatypeInfo) -> Q [Dec]
 mkWeight sys (dtVariant, info) = do
@@ -159,7 +159,7 @@ mkNewtypeSyn targetType constrName typSyn typ
     m <- qNewName "MkGen"
     mkName <- qNewName $ show m
 
-    pure $
+    pure
       ( coerce mkName
       , coerce name
       ,
@@ -251,7 +251,7 @@ mkSamplableNewtype' sys = do
       Distributions regTypeDdgs listTypeDdgs <-
         runIO $ sysDistributions sys' types
 
-      ts <- forM (Map.toList regTypeDdgs) $ \(typ, d) -> do
+      ts <- forM (Map.toList regTypeDdgs) $ \(typ, _) -> do
         (synConstr, synType, synDec) <-
           mkNewtypeSyn
             (targetType sys)
@@ -265,7 +265,7 @@ mkSamplableNewtype' sys = do
 
             dtVariant = IsNewtype synConstr synType
 
-        distribution <- [|d|]
+        distribution <- [|distribution|]
         weight <- mkWeight sys (dtVariant, info)
 
         pure
@@ -333,7 +333,7 @@ mkSamplable' sys = do
         distribution <- [|d|]
         weight <- mkWeight sys (dtVariant, info)
 
-        pure $
+        pure
           [ InstanceD Nothing [] cls $
               [ FunD
                   constrName

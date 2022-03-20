@@ -30,8 +30,10 @@ library
       Data.Boltzmann.Samplable.TH
       Data.Boltzmann.Sampler
       Data.Boltzmann.Sampler.TH
+      Data.Boltzmann.Sampler.Utils
       Data.Boltzmann.System
       Data.Boltzmann.System.TH
+      Data.Boltzmann.System.Utils
       Data.BuffonMachine
   other-modules:
       Paths_generic_boltzmann_brain

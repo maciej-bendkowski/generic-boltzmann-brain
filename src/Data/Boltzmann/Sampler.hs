@@ -12,8 +12,6 @@ module Data.Boltzmann.Sampler (
   hoistBoltzmannSampler,
 ) where
 
-import Control.Monad (guard)
-import Control.Monad.Trans (lift)
 import Control.Monad.Trans.Maybe (MaybeT, runMaybeT)
 import Data.BuffonMachine (BuffonMachine, eval)
 import System.Random (RandomGen)
@@ -21,23 +19,9 @@ import Test.QuickCheck (Gen)
 import Test.QuickCheck.Gen (Gen (MkGen))
 import Test.QuickCheck.Random (QCGen (QCGen))
 
-import Data.Boltzmann.Samplable (Distribution, Samplable (..), choice)
-
 -- | Multiparametric Boltzmann samplers.
-class Samplable a => BoltzmannSampler a where
+class BoltzmannSampler a where
   sample :: RandomGen g => Int -> MaybeT (BuffonMachine g) (a, Int)
-
-instance (Samplable [a], BoltzmannSampler a) => BoltzmannSampler [a] where
-  sample !ub = do
-    guard (ub > 0)
-    (lift $ choice (distribution :: Distribution [a]))
-      >>= ( \case
-              0 -> pure ([], 0)
-              _ -> do
-                (x, w) <- sample ub
-                (xs, ws) <- sample (ub - w)
-                pure (x : xs, w + ws)
-          )
 
 rejectionSampler ::
   (RandomGen g, BoltzmannSampler a) => Int -> Int -> BuffonMachine g a
