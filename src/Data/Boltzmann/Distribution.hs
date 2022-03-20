@@ -1,7 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Data.Boltzmann.Samplable (
-  Samplable (..),
+module Data.Boltzmann.Distribution (
   Distribution (..),
   choice,
 ) where
@@ -13,11 +12,7 @@ import System.Random (RandomGen, StdGen)
 import System.Random.SplitMix (SMGen)
 import Prelude hiding (null)
 
-class Samplable a where
-  distribution :: Distribution a
-  weight :: a -> Int
-
-newtype Distribution a = Distribution {unDistribution :: Vector Int}
+newtype Distribution = Distribution {unDistribution :: Vector Int}
   deriving stock (Show)
 
 deriveLift ''Distribution
@@ -25,18 +20,18 @@ deriveLift ''Distribution
 -- |
 --  Given a compact discrete distribution generating tree (in vector form)
 --  computes a discrete random variable following that distribution.
-choice :: RandomGen g => Distribution a -> Discrete g
+choice :: RandomGen g => Distribution -> Discrete g
 choice enc
-  | null (unDistribution enc) = return 0
+  | null (unDistribution enc) = pure 0
   | otherwise = choice' enc 0
-{-# SPECIALIZE choice :: Distribution a -> Discrete SMGen #-}
-{-# SPECIALIZE choice :: Distribution a -> Discrete StdGen #-}
+{-# SPECIALIZE choice :: Distribution -> Discrete SMGen #-}
+{-# SPECIALIZE choice :: Distribution -> Discrete StdGen #-}
 
-choice' :: RandomGen g => Distribution a -> Int -> Discrete g
+choice' :: RandomGen g => Distribution -> Int -> Discrete g
 choice' enc c = do
   h <- getBit
   let b = fromEnum h
   let c' = unDistribution enc ! (c + b)
   if unDistribution enc ! c' < 0
-    then return $ -(1 + unDistribution enc ! c')
+    then pure $ -(1 + unDistribution enc ! c')
     else choice' enc c'

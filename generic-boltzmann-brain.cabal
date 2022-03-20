@@ -26,7 +26,7 @@ source-repository head
 
 library
   exposed-modules:
-      Data.Boltzmann.Samplable
+      Data.Boltzmann.Distribution
       Data.Boltzmann.Sampler
       Data.Boltzmann.Sampler.TH
       Data.Boltzmann.System
@@ -140,7 +140,7 @@ test-suite generic-boltzmann-brain-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Test.Unit.Samplable
+      Test.Unit.Distribution
       Paths_generic_boltzmann_brain
   hs-source-dirs:
       test

@@ -10,7 +10,7 @@ module Data.Boltzmann.System (
 import Language.Haskell.TH.Syntax (Name, Type (AppT, ConT, ListT))
 
 import Control.Monad (foldM, forM, replicateM)
-import Data.Boltzmann.Samplable (Distribution (Distribution))
+import Data.Boltzmann.Distribution (Distribution (Distribution))
 import qualified Data.Map as Map
 import Data.Map.Strict (Map)
 import Data.Maybe (fromJust, fromMaybe)
@@ -122,7 +122,7 @@ mkMarkingVariables sys = do
     mapM
       ( \(cons, freq) -> do
           x <- variable' $ fromIntegral freq
-          return (cons, x)
+          pure (cons, x)
       )
       (frequencies sys)
 
@@ -172,8 +172,8 @@ defaults Nothing = 1
 defaults (Just (Let x)) = x
 
 data Distributions a = Distributions
-  { regTypeDdgs :: Map Name (Distribution a)
-  , listTypeDdgs :: Map Name (Distribution a)
+  { regTypeDdgs :: Map Name Distribution
+  , listTypeDdgs :: Map Name Distribution
   }
   deriving stock (Show)
 

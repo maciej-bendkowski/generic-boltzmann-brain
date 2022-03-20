@@ -19,7 +19,7 @@ import Data.Map (Map)
 import qualified Data.Map.Strict as Map
 
 import Control.Monad (forM)
-import Data.Boltzmann.Samplable (Distribution)
+import Data.Boltzmann.Distribution (Distribution)
 import Data.Boltzmann.System (
   Distributions (Distributions, listTypeDdgs, regTypeDdgs),
   System (targetType, weights),
@@ -72,7 +72,7 @@ idResolver :: SynonymResolver
 idResolver = MkSynonymResolver $ pure . coerce
 
 newtype TypeDistributions a = MkTypeDistributions
-  { unTypeDistributions :: TypeName -> Q (Distribution a)
+  { unTypeDistributions :: TypeName -> Q Distribution
   }
 
 mkTypeDistributions :: Distributions a -> TypeDistributions a
@@ -85,7 +85,7 @@ mkTypeDistributions Distributions {regTypeDdgs} =
           "Missing type constructor distribution for " ++ show n
 
 newtype ListTypeDistributions a = MkListTypeDistributions
-  { unListTypeDistributions :: TypeName -> Q (Distribution a)
+  { unListTypeDistributions :: TypeName -> Q Distribution
   }
 
 mkListTypeDistributions :: Distributions a -> ListTypeDistributions a

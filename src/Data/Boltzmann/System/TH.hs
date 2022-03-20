@@ -9,7 +9,7 @@ import qualified Data.Set as Set
 import Control.Monad (forM, guard)
 import Control.Monad.Trans (MonadTrans (lift))
 import Control.Monad.Trans.Reader (ReaderT (runReaderT), asks)
-import Data.Boltzmann.Samplable (Distribution, choice)
+import Data.Boltzmann.Distribution (Distribution, choice)
 import Data.Boltzmann.Sampler.TH (
   ConstructorName (MkConstructorName),
   ListTypeDistributions (unListTypeDistributions),
@@ -66,7 +66,7 @@ findTypeSyn = \case
   Plain tn -> getSynonym tn <&> ConT . coerce
   List tn -> getSynonym tn <&> AppT ListT . ConT . coerce
 
-getDistribution :: TypeVariant -> SamplerGen (Distribution ())
+getDistribution :: TypeVariant -> SamplerGen Distribution
 getDistribution = \case
   Plain tn -> do
     distributions <- asks typeDistributions
