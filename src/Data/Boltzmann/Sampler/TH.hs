@@ -25,6 +25,8 @@ import Data.Boltzmann.System (
   System (targetType, weights),
   Types (Types, regTypes),
   collectTypes,
+  hasProperConstructors,
+  hasProperFrequencies,
   paganiniSpecIO,
  )
 import Language.Haskell.TH (Q, runIO)
@@ -173,6 +175,9 @@ mkSystemCtx sys = do
 
   targetSyn <- targetTypeSynonym sys info
   let sys' = sys {targetType = coerce targetSyn}
+
+  hasProperConstructors sys'
+  hasProperFrequencies sys'
 
   types <- collectTypes sys'
   distributions <- runIO $ do

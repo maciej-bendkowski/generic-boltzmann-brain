@@ -5,11 +5,13 @@ module Data.Boltzmann.System (
   System (..),
   getWeight,
   paganiniSpecIO,
+  hasProperConstructors,
+  hasProperFrequencies,
 ) where
 
 import Language.Haskell.TH.Syntax (Name, Type (AppT, ConT, ListT))
 
-import Control.Monad (foldM, forM, replicateM)
+import Control.Monad (foldM, forM, replicateM, unless)
 import Data.Boltzmann.Distribution (Distribution (Distribution))
 import qualified Data.Map as Map
 import Data.Map.Strict (Map)
@@ -99,6 +101,50 @@ collectFromType types typ =
 
       collectFromDataTypeInfo types' info
     _ -> fail $ "Unsupported type " ++ show typ
+
+format :: Show a => Set a -> String
+format = formatList . Set.toList . Set.map show
+
+formatList :: Show a => [a] -> String
+formatList = \case
+  [] -> ""
+  [a] -> show a
+  a : xs@(_ : _) -> show a ++ ", " ++ formatList xs
+
+constructors :: System -> Q (Set Name)
+constructors sys = do
+  types <- collectTypes sys
+  let infos = Map.elems $ regTypes types
+      names = concatMap (map constructorName . datatypeCons) infos
+  pure $ Set.fromList names
+
+hasProperConstructors :: System -> Q ()
+hasProperConstructors sys = do
+  sysConstrs <- constructors sys
+  let weightConstrs = map fst (weights sys)
+      missingConstrs = sysConstrs `Set.difference` Set.fromList weightConstrs
+      additionalConstrs = Set.fromList weightConstrs `Set.difference` sysConstrs
+
+  unless (Set.null missingConstrs) $ do
+    fail $
+      "Missing weight for constructors: "
+        ++ format missingConstrs
+
+  unless (Set.null additionalConstrs) $ do
+    fail $
+      "Weight definied for non-system constructors: "
+        ++ format additionalConstrs
+
+hasProperFrequencies :: System -> Q ()
+hasProperFrequencies sys = do
+  sysConstrs <- constructors sys
+  let freqConstrs = map fst (frequencies sys)
+      additionalConstrs = Set.fromList freqConstrs `Set.difference` sysConstrs
+
+  unless (Set.null additionalConstrs) $ do
+    fail $
+      "Frequencies definied for non-system constructors: "
+        ++ format additionalConstrs
 
 mkVariables :: Set Name -> Spec (Map Name Let)
 mkVariables sys = do

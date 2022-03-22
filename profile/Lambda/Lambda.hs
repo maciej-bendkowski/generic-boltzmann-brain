@@ -6,8 +6,8 @@ import Control.Monad (replicateM)
 import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
 import Data.Boltzmann.System (System (..))
 
-import Data.Boltzmann.System.TH (mkBoltzmannSampler)
 import Data.Boltzmann.BitOracle (evalIO)
+import Data.Boltzmann.System.TH (mkBoltzmannSampler)
 import System.Random.SplitMix (SMGen)
 
 data DeBruijn
