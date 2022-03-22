@@ -3,10 +3,14 @@
 module BinTree (BinTree (..), randomBinTreeListIO) where
 
 import Control.Monad (replicateM)
-import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
-import Data.Boltzmann.System (System (..))
-import Data.Boltzmann.System.TH (mkBoltzmannSampler)
 import Data.Boltzmann.BitOracle (evalIO)
+import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
+import Data.Boltzmann.System (
+  ConstructorFrequencies (MkConstructorFrequencies),
+  ConstructorWeights (MkConstructorWeights),
+  System (..),
+ )
+import Data.Boltzmann.System.TH (mkBoltzmannSampler)
 import System.Random.SplitMix (SMGen)
 
 data BinTree
@@ -18,11 +22,12 @@ mkBoltzmannSampler
   System
     { targetType = ''BinTree
     , meanSize = 1000
-    , frequencies = []
+    , frequencies = MkConstructorFrequencies []
     , weights =
-        [ ('Leaf, 0)
-        , ('Node, 1)
-        ]
+        MkConstructorWeights
+          [ ('Leaf, 0)
+          , ('Node, 1)
+          ]
     }
 
 randomBinTreeListIO :: Int -> IO [BinTree]

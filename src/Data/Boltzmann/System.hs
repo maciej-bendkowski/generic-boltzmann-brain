@@ -1,6 +1,8 @@
 module Data.Boltzmann.System (
   Types (..),
   Distributions (..),
+  ConstructorWeights (..),
+  ConstructorFrequencies (..),
   collectTypes,
   System (..),
   getWeight,
@@ -41,19 +43,28 @@ import Language.Haskell.TH.Datatype (
   reifyDatatype,
  )
 
+import Data.Coerce (coerce)
 import Prelude hiding (seq)
+
+newtype ConstructorWeights = MkConstructorWeights
+  {unConstructorWeights :: [(Name, Int)]}
+  deriving (Show) via [(Name, Int)]
+
+newtype ConstructorFrequencies = MkConstructorFrequencies
+  {unConstructorFrequencies :: [(Name, Int)]}
+  deriving (Show) via [(Name, Int)]
 
 data System = System
   { targetType :: Name
   , meanSize :: Int
-  , weights :: [(Name, Int)]
-  , frequencies :: [(Name, Int)]
+  , weights :: ConstructorWeights
+  , frequencies :: ConstructorFrequencies
   }
   deriving (Show)
 
 getWeight :: System -> Name -> Int
 getWeight sys name =
-  fromMaybe 1 $ lookup name (weights sys)
+  fromMaybe 1 $ lookup name (coerce $ weights sys)
 
 data Types = Types
   { regTypes :: Map Name DatatypeInfo
@@ -121,7 +132,7 @@ constructors sys = do
 hasProperConstructors :: System -> Q ()
 hasProperConstructors sys = do
   sysConstrs <- constructors sys
-  let weightConstrs = map fst (weights sys)
+  let weightConstrs = map fst (unConstructorWeights $ weights sys)
       missingConstrs = sysConstrs `Set.difference` Set.fromList weightConstrs
       additionalConstrs = Set.fromList weightConstrs `Set.difference` sysConstrs
 
@@ -138,7 +149,7 @@ hasProperConstructors sys = do
 hasProperFrequencies :: System -> Q ()
 hasProperFrequencies sys = do
   sysConstrs <- constructors sys
-  let freqConstrs = map fst (frequencies sys)
+  let freqConstrs = map fst (unConstructorFrequencies $ frequencies sys)
       additionalConstrs = Set.fromList freqConstrs `Set.difference` sysConstrs
 
   unless (Set.null additionalConstrs) $ do
@@ -170,7 +181,7 @@ mkMarkingVariables sys = do
           x <- variable' $ fromIntegral freq
           pure (cons, x)
       )
-      (frequencies sys)
+      (unConstructorFrequencies $ frequencies sys)
 
   pure $ Map.fromList xs
 

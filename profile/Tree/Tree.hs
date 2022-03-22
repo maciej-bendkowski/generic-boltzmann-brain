@@ -3,10 +3,14 @@
 module Tree (Tree (..), randomTreeListIO) where
 
 import Control.Monad (replicateM)
-import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
-import Data.Boltzmann.System (System (..))
-import Data.Boltzmann.System.TH (mkBoltzmannSampler)
 import Data.Boltzmann.BitOracle (evalIO)
+import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
+import Data.Boltzmann.System (
+  ConstructorFrequencies (MkConstructorFrequencies),
+  ConstructorWeights (MkConstructorWeights),
+  System (..),
+ )
+import Data.Boltzmann.System.TH (mkBoltzmannSampler)
 import System.Random.SplitMix (SMGen)
 
 data Tree = T [Tree]
@@ -16,10 +20,11 @@ mkBoltzmannSampler
   System
     { targetType = ''Tree
     , meanSize = 1000
-    , frequencies = []
+    , frequencies = MkConstructorFrequencies []
     , weights =
-        [ ('T, 1)
-        ]
+        MkConstructorWeights
+          [ ('T, 1)
+          ]
     }
 
 randomTreeListIO :: Int -> IO [Tree]
@@ -33,8 +38,9 @@ mkBoltzmannSampler
   System
     { targetType = ''Tree'
     , meanSize = 2000
-    , frequencies = []
+    , frequencies = MkConstructorFrequencies []
     , weights =
-        [ ('T, 1)
-        ]
+        MkConstructorWeights
+          [ ('T, 1)
+          ]
     }

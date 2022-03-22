@@ -21,6 +21,7 @@ import qualified Data.Map.Strict as Map
 import Control.Monad (forM)
 import Data.Boltzmann.Distribution (Distribution)
 import Data.Boltzmann.System (
+  ConstructorWeights (unConstructorWeights),
   Distributions (Distributions, listTypeDdgs, regTypeDdgs),
   System (targetType, weights),
   Types (Types, regTypes),
@@ -106,7 +107,7 @@ newtype WeightResolver = MkWeightResolver
 mkWeightResolver :: System -> WeightResolver
 mkWeightResolver sys =
   MkWeightResolver $ \n ->
-    case coerce n `lookup` weights sys of
+    case coerce n `lookup` unConstructorWeights (weights sys) of
       Just w -> pure w
       Nothing -> fail $ "Missing constructor weight for " ++ show n
 
