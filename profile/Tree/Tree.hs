@@ -6,11 +6,11 @@ import Control.Monad (replicateM)
 import Data.Boltzmann.BitOracle (evalIO)
 import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
 import Data.Boltzmann.System (
-  ConstructorFrequencies (MkConstructorFrequencies),
   ConstructorWeights (MkConstructorWeights),
   System (..),
  )
 import Data.Boltzmann.System.TH (mkBoltzmannSampler)
+import Data.Default (Default (def))
 import System.Random.SplitMix (SMGen)
 
 data Tree = T [Tree]
@@ -20,7 +20,7 @@ mkBoltzmannSampler
   System
     { targetType = ''Tree
     , meanSize = 1000
-    , frequencies = MkConstructorFrequencies []
+    , frequencies = def
     , weights =
         MkConstructorWeights
           [ ('T, 1)
@@ -38,7 +38,7 @@ mkBoltzmannSampler
   System
     { targetType = ''Tree'
     , meanSize = 2000
-    , frequencies = MkConstructorFrequencies []
+    , frequencies = def
     , weights =
         MkConstructorWeights
           [ ('T, 1)

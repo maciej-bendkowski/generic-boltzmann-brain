@@ -44,6 +44,7 @@ import Language.Haskell.TH.Datatype (
  )
 
 import Data.Coerce (coerce)
+import Data.Default (Default (def))
 import Prelude hiding (seq)
 
 newtype ConstructorWeights = MkConstructorWeights
@@ -53,6 +54,9 @@ newtype ConstructorWeights = MkConstructorWeights
 newtype ConstructorFrequencies = MkConstructorFrequencies
   {unConstructorFrequencies :: [(Name, Int)]}
   deriving (Show) via [(Name, Int)]
+
+instance Default ConstructorFrequencies where
+  def = MkConstructorFrequencies []
 
 data System = System
   { targetType :: Name

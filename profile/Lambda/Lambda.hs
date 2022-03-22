@@ -11,6 +11,7 @@ import Data.Boltzmann.System (
   System (..),
  )
 import Data.Boltzmann.System.TH (mkBoltzmannSampler)
+import Data.Default (Default (def))
 import System.Random.SplitMix (SMGen)
 
 data DeBruijn
@@ -28,7 +29,7 @@ mkBoltzmannSampler
   System
     { targetType = ''Lambda
     , meanSize = 10_000
-    , frequencies = MkConstructorFrequencies []
+    , frequencies = def
     , weights =
         MkConstructorWeights
           [ -- De Bruijn

@@ -6,11 +6,11 @@ import Control.Monad (replicateM)
 import Data.Boltzmann.BitOracle (evalIO)
 import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
 import Data.Boltzmann.System (
-  ConstructorFrequencies (MkConstructorFrequencies),
   ConstructorWeights (MkConstructorWeights),
   System (..),
  )
 import Data.Boltzmann.System.TH (mkBoltzmannSampler)
+import Data.Default (Default (def))
 import System.Random.SplitMix (SMGen)
 
 data BinTree
@@ -22,7 +22,7 @@ mkBoltzmannSampler
   System
     { targetType = ''BinTree
     , meanSize = 1000
-    , frequencies = MkConstructorFrequencies []
+    , frequencies = def
     , weights =
         MkConstructorWeights
           [ ('Leaf, 0)

@@ -43,6 +43,7 @@ library
       QuickCheck >=2.14.2
     , base >=4.7 && <5
     , containers >=0.6.4
+    , data-default >=0.7.1.1
     , mtl >=2.2.2
     , paganini-hs >=0.3.0.0
     , random >=1.2.0
@@ -69,6 +70,7 @@ executable binTreeProfile
       QuickCheck >=2.14.2
     , base >=4.7 && <5
     , containers >=0.6.4
+    , data-default >=0.7.1.1
     , generic-boltzmann-brain
     , mtl >=2.2.2
     , paganini-hs >=0.3.0.0
@@ -96,6 +98,7 @@ executable lambdaProfile
       QuickCheck >=2.14.2
     , base >=4.7 && <5
     , containers >=0.6.4
+    , data-default >=0.7.1.1
     , generic-boltzmann-brain
     , mtl >=2.2.2
     , paganini-hs >=0.3.0.0
@@ -123,6 +126,7 @@ executable treeProfile
       QuickCheck >=2.14.2
     , base >=4.7 && <5
     , containers >=0.6.4
+    , data-default >=0.7.1.1
     , generic-boltzmann-brain
     , mtl >=2.2.2
     , paganini-hs >=0.3.0.0
@@ -151,6 +155,7 @@ test-suite generic-boltzmann-brain-test
       QuickCheck >=2.14.2
     , base >=4.7 && <5
     , containers >=0.6.4
+    , data-default >=0.7.1.1
     , generic-boltzmann-brain
     , mtl >=2.2.2
     , paganini-hs >=0.3.0.0
