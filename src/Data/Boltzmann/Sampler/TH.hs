@@ -11,6 +11,7 @@ module Data.Boltzmann.Sampler.TH (
   SamplerCtx (..),
   mkSystemCtx,
   targetTypeSynonym,
+  mkDefWeights,
 ) where
 
 import Data.Coerce (coerce)
@@ -21,22 +22,25 @@ import qualified Data.Map.Strict as Map
 import Control.Monad (forM)
 import Data.Boltzmann.Distribution (Distribution)
 import Data.Boltzmann.System (
-  ConstructorWeights (unConstructorWeights),
+  ConstructorWeights (MkConstructorWeights, unConstructorWeights),
   Distributions (Distributions, listTypeDdgs, regTypeDdgs),
   System (targetType, weights),
   Types (Types, regTypes),
   collectTypes,
+  collectTypes',
   hasProperConstructors,
   hasProperFrequencies,
   paganiniSpecIO,
  )
-import Language.Haskell.TH (Q, runIO)
+
+import Language.Haskell.TH (Exp, Q, runIO)
 import Language.Haskell.TH.Datatype (
-  ConstructorInfo (constructorFields),
+  ConstructorInfo (constructorFields, constructorName),
   DatatypeInfo (datatypeCons, datatypeVariant),
   DatatypeVariant (Datatype, Newtype),
   reifyDatatype,
  )
+import qualified Language.Haskell.TH.Lift as Lift
 import Language.Haskell.TH.Syntax (
   Bang (Bang),
   Con (NormalC),
@@ -119,10 +123,10 @@ data SamplerCtx a = SamplerCtx
   , typeDeclarations :: [Dec]
   }
 
-targetTypeSynonym :: System -> DatatypeInfo -> Q Synonym
-targetTypeSynonym sys info = do
+targetTypeSynonym :: Name -> DatatypeInfo -> Q Synonym
+targetTypeSynonym targetType info = do
   case datatypeVariant info of
-    Datatype -> pure $ MkSynonym (targetType sys)
+    Datatype -> pure $ MkSynonym targetType
     Newtype ->
       case datatypeCons info of
         [consInfo] ->
@@ -174,7 +178,7 @@ mkSystemCtx sys = do
   let target = targetType sys
   info <- reifyDatatype target
 
-  targetSyn <- targetTypeSynonym sys info
+  targetSyn <- targetTypeSynonym target info
   let sys' = sys {targetType = coerce targetSyn}
 
   hasProperConstructors sys'
@@ -205,3 +209,14 @@ mkSystemCtx sys = do
       , constructorWeight = mkWeightResolver sys
       , typeDeclarations = decs
       }
+
+mkDefWeights :: Name -> Q Exp
+mkDefWeights targetType = do
+  info <- reifyDatatype targetType
+  targetSyn <- targetTypeSynonym targetType info
+
+  types <- collectTypes' (coerce targetSyn)
+  let infos = Map.elems $ regTypes types
+      names = concatMap (map constructorName . datatypeCons) infos
+
+  Lift.lift (MkConstructorWeights $ names `zip` repeat (1 :: Int))

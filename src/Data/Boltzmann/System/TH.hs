@@ -271,7 +271,7 @@ mkBoltzmannSampler sys = do
   let target = targetType sys
   info <- reifyDatatype target
 
-  targetSyn <- targetTypeSynonym sys info
+  targetSyn <- targetTypeSynonym target info
   let sys' = sys {targetType = coerce targetSyn}
 
   runReaderT (mkBoltzmannSampler' sys') ctx

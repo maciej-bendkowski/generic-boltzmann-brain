@@ -5,8 +5,8 @@ module Tree (Tree (..), randomTreeListIO) where
 import Control.Monad (replicateM)
 import Data.Boltzmann.BitOracle (evalIO)
 import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
+import Data.Boltzmann.Sampler.TH (mkDefWeights)
 import Data.Boltzmann.System (
-  ConstructorWeights (MkConstructorWeights),
   System (..),
  )
 import Data.Boltzmann.System.TH (mkBoltzmannSampler)
@@ -21,10 +21,7 @@ mkBoltzmannSampler
     { targetType = ''Tree
     , meanSize = 1000
     , frequencies = def
-    , weights =
-        MkConstructorWeights
-          [ ('T, 1)
-          ]
+    , weights = $(mkDefWeights ''Tree)
     }
 
 randomTreeListIO :: Int -> IO [Tree]
@@ -39,8 +36,5 @@ mkBoltzmannSampler
     { targetType = ''Tree'
     , meanSize = 2000
     , frequencies = def
-    , weights =
-        MkConstructorWeights
-          [ ('T, 1)
-          ]
+    , weights = $(mkDefWeights ''Tree')
     }

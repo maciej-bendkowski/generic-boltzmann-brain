@@ -1,9 +1,12 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module Data.Boltzmann.System (
   Types (..),
   Distributions (..),
   ConstructorWeights (..),
   ConstructorFrequencies (..),
   collectTypes,
+  collectTypes',
   System (..),
   getWeight,
   paganiniSpecIO,
@@ -11,7 +14,10 @@ module Data.Boltzmann.System (
   hasProperFrequencies,
 ) where
 
-import Language.Haskell.TH.Syntax (Name, Type (AppT, ConT, ListT))
+import Language.Haskell.TH.Syntax (
+  Name,
+  Type (AppT, ConT, ListT),
+ )
 
 import Control.Monad (foldM, forM, replicateM, unless)
 import Data.Boltzmann.Distribution (Distribution (Distribution))
@@ -42,6 +48,7 @@ import Language.Haskell.TH.Datatype (
   DatatypeInfo (datatypeCons, datatypeName),
   reifyDatatype,
  )
+import qualified Language.Haskell.TH.Lift as Lift
 
 import Data.Coerce (coerce)
 import Data.Default (Default (def))
@@ -50,6 +57,8 @@ import Prelude hiding (seq)
 newtype ConstructorWeights = MkConstructorWeights
   {unConstructorWeights :: [(Name, Int)]}
   deriving (Show) via [(Name, Int)]
+
+Lift.deriveLift ''ConstructorWeights
 
 newtype ConstructorFrequencies = MkConstructorFrequencies
   {unConstructorFrequencies :: [(Name, Int)]}
@@ -80,8 +89,11 @@ initTypes :: Types
 initTypes = Types Map.empty Set.empty
 
 collectTypes :: System -> Q Types
-collectTypes sys = do
-  info <- reifyDatatype $ targetType sys
+collectTypes = collectTypes' . targetType
+
+collectTypes' :: Name -> Q Types
+collectTypes' targetType = do
+  info <- reifyDatatype targetType
   collectFromDataTypeInfo initTypes info
 
 collectFromDataTypeInfo ::
