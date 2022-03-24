@@ -12,6 +12,7 @@ module Data.Boltzmann.Sampler.TH (
   mkSystemCtx,
   targetTypeSynonym,
   mkDefWeights,
+  mkDefWeights',
 ) where
 
 import Data.Coerce (coerce)
@@ -210,8 +211,8 @@ mkSystemCtx sys = do
       , typeDeclarations = decs
       }
 
-mkDefWeights :: Name -> Q Exp
-mkDefWeights targetType = do
+mkDefWeights' :: Name -> Q ConstructorWeights
+mkDefWeights' targetType = do
   info <- reifyDatatype targetType
   targetSyn <- targetTypeSynonym targetType info
 
@@ -219,4 +220,8 @@ mkDefWeights targetType = do
   let infos = Map.elems $ regTypes types
       names = concatMap (map constructorName . datatypeCons) infos
 
-  Lift.lift (MkConstructorWeights $ names `zip` repeat (1 :: Int))
+  pure $ MkConstructorWeights $ names `zip` repeat (1 :: Int)
+
+mkDefWeights :: Name -> Q Exp
+mkDefWeights targetType =
+  mkDefWeights' targetType >>= Lift.lift

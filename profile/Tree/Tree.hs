@@ -9,20 +9,14 @@ import Data.Boltzmann.Sampler.TH (mkDefWeights)
 import Data.Boltzmann.System (
   System (..),
  )
-import Data.Boltzmann.System.TH (mkBoltzmannSampler)
+import Data.Boltzmann.System.TH (mkDefBoltzmannSampler)
 import Data.Default (Default (def))
 import System.Random.SplitMix (SMGen)
 
 data Tree = T [Tree]
   deriving (Show)
 
-mkBoltzmannSampler
-  System
-    { targetType = ''Tree
-    , meanSize = 1000
-    , frequencies = def
-    , weights = $(mkDefWeights ''Tree)
-    }
+mkDefBoltzmannSampler ''Tree 100
 
 randomTreeListIO :: Int -> IO [Tree]
 randomTreeListIO n =
@@ -31,10 +25,4 @@ randomTreeListIO n =
 newtype Tree' = MkTree' Tree
   deriving (Show)
 
-mkBoltzmannSampler
-  System
-    { targetType = ''Tree'
-    , meanSize = 2000
-    , frequencies = def
-    , weights = $(mkDefWeights ''Tree')
-    }
+mkDefBoltzmannSampler ''Tree' 2000

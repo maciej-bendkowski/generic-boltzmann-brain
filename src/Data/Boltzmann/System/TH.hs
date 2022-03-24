@@ -1,7 +1,10 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Data.Boltzmann.System.TH (mkBoltzmannSampler) where
+module Data.Boltzmann.System.TH (
+  mkBoltzmannSampler,
+  mkDefBoltzmannSampler,
+) where
 
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
@@ -25,13 +28,25 @@ import Data.Boltzmann.Sampler.TH (
   TypeDistributions (unTypeDistributions),
   TypeName (MkTypeName),
   WeightResolver (unWeightResolver),
+  mkDefWeights',
   mkSystemCtx,
   targetTypeSynonym,
  )
-import Data.Boltzmann.System (System (targetType), Types (Types), collectTypes)
+import Data.Boltzmann.System (
+  System (
+    System,
+    frequencies,
+    meanSize,
+    targetType,
+    weights
+  ),
+  Types (Types),
+  collectTypes,
+ )
 import Data.Coerce (coerce)
+import Data.Default (def)
 import Data.Functor ((<&>))
-import Language.Haskell.TH (Exp (LamCaseE), Q, Type (ListT))
+import Language.Haskell.TH (Exp (LamCaseE), Name, Q, Type (ListT))
 import Language.Haskell.TH.Datatype (
   ConstructorInfo (constructorFields, constructorName),
   DatatypeInfo (datatypeCons),
@@ -275,3 +290,14 @@ mkBoltzmannSampler sys = do
   let sys' = sys {targetType = coerce targetSyn}
 
   runReaderT (mkBoltzmannSampler' sys') ctx
+
+mkDefBoltzmannSampler :: Name -> Int -> Q [Dec]
+mkDefBoltzmannSampler typ meanSize = do
+  defWeights <- mkDefWeights' typ
+  mkBoltzmannSampler $
+    System
+      { targetType = typ
+      , meanSize = meanSize
+      , frequencies = def
+      , weights = defWeights
+      }
