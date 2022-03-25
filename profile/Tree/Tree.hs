@@ -5,12 +5,7 @@ module Tree (Tree (..), randomTreeListIO) where
 import Control.Monad (replicateM)
 import Data.Boltzmann.BitOracle (evalIO)
 import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
-import Data.Boltzmann.Sampler.TH (mkDefWeights)
-import Data.Boltzmann.System (
-  System (..),
- )
 import Data.Boltzmann.System.TH (mkDefBoltzmannSampler)
-import Data.Default (Default (def))
 import System.Random.SplitMix (SMGen)
 
 data Tree = T [Tree]

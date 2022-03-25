@@ -12,6 +12,7 @@ module Data.Boltzmann.System (
   paganiniSpecIO,
   hasProperConstructors,
   hasProperFrequencies,
+  Constructable (..),
 ) where
 
 import Language.Haskell.TH.Syntax (
@@ -54,9 +55,27 @@ import Data.Coerce (coerce)
 import Data.Default (Default (def))
 import Prelude hiding (seq)
 
+class Constructable a where
+  (<:>) :: (Name, Int) -> a -> a
+
+infixr 6 <:>
+
 newtype ConstructorWeights = MkConstructorWeights
   {unConstructorWeights :: [(Name, Int)]}
   deriving (Show) via [(Name, Int)]
+
+instance Semigroup ConstructorWeights where
+  -- left-biased union
+  xs <> ys = MkConstructorWeights (Map.toList $ xs' <> ys')
+    where
+      xs' = Map.fromList (unConstructorWeights xs)
+      ys' = Map.fromList (unConstructorWeights ys)
+
+instance Monoid ConstructorWeights where
+  mempty = MkConstructorWeights []
+
+instance Constructable ConstructorWeights where
+  x <:> xs = MkConstructorWeights [x] <> xs
 
 Lift.deriveLift ''ConstructorWeights
 
@@ -66,6 +85,19 @@ newtype ConstructorFrequencies = MkConstructorFrequencies
 
 instance Default ConstructorFrequencies where
   def = MkConstructorFrequencies []
+
+instance Semigroup ConstructorFrequencies where
+  -- left-biased union
+  xs <> ys = MkConstructorFrequencies (Map.toList $ xs' <> ys')
+    where
+      xs' = Map.fromList (unConstructorFrequencies xs)
+      ys' = Map.fromList (unConstructorFrequencies ys)
+
+instance Monoid ConstructorFrequencies where
+  mempty = def
+
+instance Constructable ConstructorFrequencies where
+  x <:> xs = MkConstructorFrequencies [x] <> xs
 
 data System = System
   { targetType :: Name

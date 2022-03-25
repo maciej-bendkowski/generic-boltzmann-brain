@@ -5,9 +5,9 @@ module Lambda (Lambda (..), randomLambdaListIO) where
 import Control.Monad (replicateM)
 import Data.Boltzmann.BitOracle (evalIO)
 import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
+import Data.Boltzmann.Sampler.TH (mkDefWeights)
 import Data.Boltzmann.System (
-  ConstructorFrequencies (MkConstructorFrequencies),
-  ConstructorWeights (MkConstructorWeights),
+  Constructable ((<:>)),
   System (..),
  )
 import Data.Boltzmann.System.TH (mkBoltzmannSampler)
@@ -31,15 +31,8 @@ mkBoltzmannSampler
     , meanSize = 10_000
     , frequencies = def
     , weights =
-        MkConstructorWeights
-          [ -- De Bruijn
-            ('S, 1)
-          , ('Z, 1)
-          , -- Lambda
-            ('Index, 0)
-          , ('App, 1)
-          , ('Abs, 1)
-          ]
+        ('Index, 0)
+          <:> $(mkDefWeights ''Lambda)
     }
 
 newtype BinLambda = MkBinLambda Lambda
@@ -49,18 +42,16 @@ mkBoltzmannSampler
   System
     { targetType = ''BinLambda
     , meanSize = 10_000
-    , frequencies = MkConstructorFrequencies [('Abs, 4500)]
+    , frequencies =
+        ('Abs, 4500) <:> def
     , weights =
-        MkConstructorWeights
-          [ -- De Bruijn
-            ('S, 1)
-          , ('Z, 1)
-          , -- Lambda
-            ('Index, 0)
-          , ('App, 2)
-          , ('Abs, 2)
-          ]
+        ('Index, 0)
+          <:> ('App, 2)
+          <:> ('Abs, 2)
+          <:> $(mkDefWeights ''Lambda)
     }
 
 randomLambdaListIO :: Int -> IO [BinLambda]
-randomLambdaListIO n = evalIO $ replicateM n (rejectionSampler' @SMGen 10_000 0.2)
+randomLambdaListIO n =
+  evalIO $
+    replicateM n (rejectionSampler' @SMGen 10_000 0.2)

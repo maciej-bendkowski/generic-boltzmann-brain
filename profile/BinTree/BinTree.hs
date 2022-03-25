@@ -5,8 +5,9 @@ module BinTree (BinTree (..), randomBinTreeListIO) where
 import Control.Monad (replicateM)
 import Data.Boltzmann.BitOracle (evalIO)
 import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
+import Data.Boltzmann.Sampler.TH (mkDefWeights)
 import Data.Boltzmann.System (
-  ConstructorWeights (MkConstructorWeights),
+  Constructable ((<:>)),
   System (..),
  )
 import Data.Boltzmann.System.TH (mkBoltzmannSampler)
@@ -24,10 +25,8 @@ mkBoltzmannSampler
     , meanSize = 1000
     , frequencies = def
     , weights =
-        MkConstructorWeights
-          [ ('Leaf, 0)
-          , ('Node, 1)
-          ]
+        ('Leaf, 0)
+          <:> $(mkDefWeights ''BinTree)
     }
 
 randomBinTreeListIO :: Int -> IO [BinTree]
