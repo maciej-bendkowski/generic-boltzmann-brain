@@ -11,7 +11,7 @@ import Data.Boltzmann (
   evalIO,
   mkBoltzmannSampler,
   mkDefWeights,
-  rejectionSampler',
+  toleranceRejectionSampler,
  )
 import Data.Default (Default (def))
 
@@ -34,4 +34,4 @@ mkBoltzmannSampler
 
 randomBinTreeListIO :: Int -> IO [BinTree]
 randomBinTreeListIO n =
-  evalIO $ replicateM n (rejectionSampler' @SMGen 1000 0.2)
+  evalIO $ replicateM n (toleranceRejectionSampler @SMGen 1000 0.2)

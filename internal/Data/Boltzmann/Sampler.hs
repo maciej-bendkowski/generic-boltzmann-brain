@@ -8,7 +8,7 @@
 module Data.Boltzmann.Sampler (
   BoltzmannSampler (..),
   rejectionSampler,
-  rejectionSampler',
+  toleranceRejectionSampler,
   hoistBoltzmannSampler,
 ) where
 
@@ -35,9 +35,9 @@ rejectionSampler lb ub = do
             Nothing -> rejectionSampler lb ub
         )
 
-rejectionSampler' ::
+toleranceRejectionSampler ::
   (RandomGen g, BoltzmannSampler a) => Int -> Double -> BitOracle g a
-rejectionSampler' n eps = rejectionSampler lb ub
+toleranceRejectionSampler n eps = rejectionSampler lb ub
   where
     lb = floor $ (1 - eps) * fromIntegral n
     ub = ceiling $ (1 + eps) * fromIntegral n

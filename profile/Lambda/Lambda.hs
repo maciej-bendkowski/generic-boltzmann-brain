@@ -11,7 +11,7 @@ import Data.Boltzmann (
   evalIO,
   mkBoltzmannSampler,
   mkDefWeights,
-  rejectionSampler',
+  toleranceRejectionSampler,
  )
 import Data.Default (Default (def))
 
@@ -57,4 +57,4 @@ mkBoltzmannSampler
 randomLambdaListIO :: Int -> IO [BinLambda]
 randomLambdaListIO n =
   evalIO $
-    replicateM n (rejectionSampler' @SMGen 10_000 0.2)
+    replicateM n (toleranceRejectionSampler @SMGen 10_000 0.2)

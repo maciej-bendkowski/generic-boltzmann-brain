@@ -8,7 +8,7 @@ import Data.Boltzmann (
   BoltzmannSampler (..),
   evalIO,
   mkDefBoltzmannSampler,
-  rejectionSampler',
+  toleranceRejectionSampler,
  )
 
 import System.Random.SplitMix (SMGen)
@@ -20,7 +20,7 @@ mkDefBoltzmannSampler ''Tree 100
 
 randomTreeListIO :: Int -> IO [Tree]
 randomTreeListIO n =
-  evalIO $ replicateM n (rejectionSampler' @SMGen 1000 0.2)
+  evalIO $ replicateM n (toleranceRejectionSampler @SMGen 1000 0.2)
 
 newtype Tree' = MkTree' Tree
   deriving (Show)

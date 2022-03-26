@@ -7,7 +7,7 @@ module Data.Boltzmann (
   mkDefBoltzmannSampler,
   BoltzmannSampler (..),
   rejectionSampler,
-  rejectionSampler',
+  toleranceRejectionSampler,
   mkDefWeights,
   BitOracle,
   EvalIO (..),
@@ -29,7 +29,7 @@ import Data.Boltzmann.System.TH (
 import Data.Boltzmann.Sampler (
   BoltzmannSampler (..),
   rejectionSampler,
-  rejectionSampler',
+  toleranceRejectionSampler,
  )
 
 import Data.Boltzmann.Sampler.TH (
