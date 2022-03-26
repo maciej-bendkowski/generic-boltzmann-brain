@@ -21,7 +21,7 @@ import Language.Haskell.TH.Syntax (
  )
 
 import Control.Monad (foldM, forM, replicateM, unless)
-import Data.Boltzmann.Distribution (Distribution (Distribution))
+import Data.Boltzmann.BitOracle (Distribution (Distribution))
 import qualified Data.Map as Map
 import Data.Map.Strict (Map)
 import Data.Maybe (fromJust, fromMaybe)

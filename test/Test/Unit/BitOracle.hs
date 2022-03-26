@@ -1,8 +1,7 @@
-module Test.Unit.Distribution (unitTests) where
+module Test.Unit.BitOracle (unitTests) where
 
 import Control.Monad (replicateM)
-import Data.Boltzmann.Distribution (Distribution (..), choice)
-import Data.Boltzmann.BitOracle (evalIO)
+import Data.Boltzmann.BitOracle (Distribution (..), choice, evalIO)
 import qualified Data.Map as Map
 import Data.Vector (fromList)
 import System.Random.SplitMix (SMGen)

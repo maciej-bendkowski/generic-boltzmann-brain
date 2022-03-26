@@ -21,7 +21,7 @@ import Data.Map (Map)
 import qualified Data.Map.Strict as Map
 
 import Control.Monad (forM)
-import Data.Boltzmann.Distribution (Distribution)
+import Data.Boltzmann.BitOracle (Distribution)
 import Data.Boltzmann.System (
   ConstructorWeights (MkConstructorWeights, unConstructorWeights),
   Distributions (Distributions, listTypeDdgs, regTypeDdgs),

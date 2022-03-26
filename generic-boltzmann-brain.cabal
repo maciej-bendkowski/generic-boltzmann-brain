@@ -55,7 +55,6 @@ library
 library generic-boltzmann-brain-internal
   exposed-modules:
       Data.Boltzmann.BitOracle
-      Data.Boltzmann.Distribution
       Data.Boltzmann.Sampler
       Data.Boltzmann.Sampler.TH
       Data.Boltzmann.System
@@ -172,7 +171,7 @@ test-suite generic-boltzmann-brain-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Test.Unit.Distribution
+      Test.Unit.BitOracle
       Paths_generic_boltzmann_brain
   hs-source-dirs:
       test

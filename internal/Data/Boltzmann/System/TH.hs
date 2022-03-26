@@ -12,7 +12,7 @@ import qualified Data.Set as Set
 import Control.Monad (forM, guard)
 import Control.Monad.Trans (MonadTrans (lift))
 import Control.Monad.Trans.Reader (ReaderT (runReaderT), asks)
-import Data.Boltzmann.Distribution (Distribution, choice)
+import Data.Boltzmann.BitOracle (Distribution, choice)
 import Data.Boltzmann.Sampler.TH (
   ConstructorName (MkConstructorName),
   ListTypeDistributions (unListTypeDistributions),
