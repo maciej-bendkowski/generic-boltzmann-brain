@@ -3,15 +3,18 @@
 module BinTree (BinTree (..), randomBinTreeListIO) where
 
 import Control.Monad (replicateM)
-import Data.Boltzmann.BitOracle (evalIO)
-import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
-import Data.Boltzmann.Sampler.TH (mkDefWeights)
-import Data.Boltzmann.System (
+
+import Data.Boltzmann (
+  BoltzmannSampler (..),
   Constructable ((<:>)),
   System (..),
+  evalIO,
+  mkBoltzmannSampler,
+  mkDefWeights,
+  rejectionSampler',
  )
-import Data.Boltzmann.System.TH (mkBoltzmannSampler)
 import Data.Default (Default (def))
+
 import System.Random.SplitMix (SMGen)
 
 data BinTree

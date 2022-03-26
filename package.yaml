@@ -35,26 +35,53 @@ dependencies:
 - data-default >= 0.7.1.1
 
 library:
-  source-dirs: src
-  ghc-options:
-  - -O2
-  - -Wall
-  - -Wcompat
-  - -Wmissing-export-lists
-  - -Wincomplete-record-updates
-  - -Wincomplete-uni-patterns
-  - -Wredundant-constraints
-  - -Wno-name-shadowing
-  - -fwarn-missing-signatures
-  default-extensions:
-    LambdaCase
-    BangPatterns
-    DerivingVia
-    FlexibleInstances
-    UndecidableInstances
-    TypeApplications
-    ScopedTypeVariables
-    Rank2Types
+    source-dirs: src
+    exposed-modules:
+      Data.Boltzmann
+    dependencies:
+    - generic-boltzmann-brain-internal
+    ghc-options:
+    - -O2
+    - -Wall
+    - -Wcompat
+    - -Wmissing-export-lists
+    - -Wincomplete-record-updates
+    - -Wincomplete-uni-patterns
+    - -Wredundant-constraints
+    - -Wno-name-shadowing
+    - -fwarn-missing-signatures
+    default-extensions:
+      LambdaCase
+      BangPatterns
+      DerivingVia
+      FlexibleInstances
+      UndecidableInstances
+      TypeApplications
+      ScopedTypeVariables
+      Rank2Types
+
+internal-libraries:
+  generic-boltzmann-brain-internal:
+    source-dirs: internal
+    ghc-options:
+    - -O2
+    - -Wall
+    - -Wcompat
+    - -Wmissing-export-lists
+    - -Wincomplete-record-updates
+    - -Wincomplete-uni-patterns
+    - -Wredundant-constraints
+    - -Wno-name-shadowing
+    - -fwarn-missing-signatures
+    default-extensions:
+      LambdaCase
+      BangPatterns
+      DerivingVia
+      FlexibleInstances
+      UndecidableInstances
+      TypeApplications
+      ScopedTypeVariables
+     Rank2Types
 
 executables:
   binTreeProfile:
@@ -151,6 +178,7 @@ tests:
     - -Wno-name-shadowing
     - -fwarn-missing-signatures
     dependencies:
+    - generic-boltzmann-brain-internal
     - generic-boltzmann-brain
     - tasty >= 1.4.2
     - tasty-hunit >= 0.10.0

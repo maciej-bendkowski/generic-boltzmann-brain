@@ -1,4 +1,4 @@
-cabal-version: 1.12
+cabal-version: 2.0
 
 -- This file has been generated from package.yaml by hpack version 0.34.4.
 --
@@ -26,6 +26,34 @@ source-repository head
 
 library
   exposed-modules:
+      Data.Boltzmann
+  other-modules:
+      Paths_generic_boltzmann_brain
+  hs-source-dirs:
+      src
+  default-extensions:
+      LambdaCase BangPatterns DerivingVia FlexibleInstances UndecidableInstances TypeApplications ScopedTypeVariables Rank2Types
+  ghc-options: -O2 -Wall -Wcompat -Wmissing-export-lists -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -Wno-name-shadowing -fwarn-missing-signatures
+  build-depends:
+      QuickCheck >=2.14.2
+    , base >=4.7 && <5
+    , containers >=0.6.4
+    , data-default >=0.7.1.1
+    , generic-boltzmann-brain-internal
+    , mtl >=2.2.2
+    , paganini-hs >=0.3.0.0
+    , random >=1.2.0
+    , splitmix >=0.1.0.4
+    , template-haskell >=2.17.0.0
+    , th-abstraction >=0.4.3.0
+    , th-lift >=0.8.2
+    , th-lift-instances >=0.1.18
+    , transformers >=0.5.6
+    , vector >=0.12.3.1
+  default-language: Haskell2010
+
+library generic-boltzmann-brain-internal
+  exposed-modules:
       Data.Boltzmann.BitOracle
       Data.Boltzmann.Distribution
       Data.Boltzmann.Sampler
@@ -35,7 +63,7 @@ library
   other-modules:
       Paths_generic_boltzmann_brain
   hs-source-dirs:
-      src
+      internal
   default-extensions:
       LambdaCase BangPatterns DerivingVia FlexibleInstances UndecidableInstances TypeApplications ScopedTypeVariables Rank2Types
   ghc-options: -O2 -Wall -Wcompat -Wmissing-export-lists -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -Wno-name-shadowing -fwarn-missing-signatures
@@ -157,6 +185,7 @@ test-suite generic-boltzmann-brain-test
     , containers >=0.6.4
     , data-default >=0.7.1.1
     , generic-boltzmann-brain
+    , generic-boltzmann-brain-internal
     , mtl >=2.2.2
     , paganini-hs >=0.3.0.0
     , random >=1.2.0

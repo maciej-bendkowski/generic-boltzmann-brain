@@ -3,9 +3,14 @@
 module Tree (Tree (..), randomTreeListIO) where
 
 import Control.Monad (replicateM)
-import Data.Boltzmann.BitOracle (evalIO)
-import Data.Boltzmann.Sampler (BoltzmannSampler (..), rejectionSampler')
-import Data.Boltzmann.System.TH (mkDefBoltzmannSampler)
+
+import Data.Boltzmann (
+  BoltzmannSampler (..),
+  evalIO,
+  mkDefBoltzmannSampler,
+  rejectionSampler',
+ )
+
 import System.Random.SplitMix (SMGen)
 
 data Tree = T [Tree]
