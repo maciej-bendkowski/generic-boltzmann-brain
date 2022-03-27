@@ -222,6 +222,10 @@ mkDefWeights' targetType = do
 
   pure $ MkConstructorWeights $ names `zip` repeat (1 :: Int)
 
+-- |
+--  Generates a @ConstructorWeights@ container with all constructors
+--  in the system corresponding to the target type. Constructor weights
+--  are all set to one.
 mkDefWeights :: Name -> Q Exp
 mkDefWeights targetType =
   mkDefWeights' targetType >>= Lift.lift

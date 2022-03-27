@@ -1,5 +1,12 @@
 {-# LANGUAGE TemplateHaskell #-}
 
+-- |
+-- Module      : Data.Boltzmann.System
+-- Description :
+-- Copyright   : (c) Maciej Bendkowski, 2022
+-- License     : BSD3
+-- Maintainer  : maciej.bendkowski@gmail.com
+-- Stability   : experimental
 module Data.Boltzmann.System (
   Types (..),
   Distributions (..),
@@ -55,17 +62,26 @@ import Data.Coerce (coerce)
 import Data.Default (Default (def))
 import Prelude hiding (seq)
 
+-- |
+--  Map-like containers for constructors with respective weights/frequencies.
+--  Stored constructors should have unique values.
 class Constructable a where
+  -- |
+  --  Inserts a new name @(constructor, value)@ pair into the container.
+  --  If the constructor is already present in the container, its value
+  --  should be updated.
   (<:>) :: (Name, Int) -> a -> a
 
 infixr 6 <:>
 
+-- |
+--  Constructors with corresponding weights.
+--  Note that semigroup's @<>@ is left-biased.
 newtype ConstructorWeights = MkConstructorWeights
   {unConstructorWeights :: [(Name, Int)]}
   deriving (Show) via [(Name, Int)]
 
 instance Semigroup ConstructorWeights where
-  -- left-biased union
   xs <> ys = MkConstructorWeights (Map.toList $ xs' <> ys')
     where
       xs' = Map.fromList (unConstructorWeights xs)
@@ -79,6 +95,9 @@ instance Constructable ConstructorWeights where
 
 Lift.deriveLift ''ConstructorWeights
 
+-- |
+--  Constructors with corresponding frequencies.
+--  Note that semigroup's @<>@ is left-biased.
 newtype ConstructorFrequencies = MkConstructorFrequencies
   {unConstructorFrequencies :: [(Name, Int)]}
   deriving (Show) via [(Name, Int)]
@@ -99,11 +118,17 @@ instance Monoid ConstructorFrequencies where
 instance Constructable ConstructorFrequencies where
   x <:> xs = MkConstructorFrequencies [x] <> xs
 
+-- |
+--  System of algebraic data types.
 data System = System
-  { targetType :: Name
-  , meanSize :: Int
-  , weights :: ConstructorWeights
-  , frequencies :: ConstructorFrequencies
+  { -- | Target type of the system.
+    targetType :: Name
+  , -- | Target mean size of the target types.
+    meanSize :: Int
+  , -- | Weights of all constructors in the system.
+    weights :: ConstructorWeights
+  , -- | Frequencies of selected constructors in the system.
+    frequencies :: ConstructorFrequencies
   }
   deriving (Show)
 

@@ -280,6 +280,10 @@ mkBoltzmannSampler' sys = do
 
   pure $ typeSynonyms <> concat decls
 
+-- |
+--  Given a system of algebraic data types, generates a series of corresponding
+--  @BoltzmannSampler@ instances. For @newtype@ target types, anonymous
+--  intermediate types are constructed.
 mkBoltzmannSampler :: System -> Q [Dec]
 mkBoltzmannSampler sys = do
   ctx <- mkSystemCtx sys
@@ -291,6 +295,11 @@ mkBoltzmannSampler sys = do
 
   runReaderT (mkBoltzmannSampler' sys') ctx
 
+-- |
+--  Given a target type name and a mean size, generates a Boltzmann sampler for
+--  the corresponding system using @mkBoltzmannSampler@. Default constructor
+--  weights are used (see @mkDefWeights@). No custom constructor frequencies are
+--  assumed.
 mkDefBoltzmannSampler :: Name -> Int -> Q [Dec]
 mkDefBoltzmannSampler typ meanSize = do
   defWeights <- mkDefWeights' typ

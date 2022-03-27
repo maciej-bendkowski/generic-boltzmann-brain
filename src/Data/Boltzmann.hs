@@ -1,15 +1,20 @@
 module Data.Boltzmann (
-  ConstructorWeights,
-  ConstructorFrequencies,
-  System (..),
+  -- * Combinatorial systems
   Constructable (..),
-  mkBoltzmannSampler,
-  mkDefBoltzmannSampler,
+  ConstructorFrequencies,
+  ConstructorWeights,
+  System (..),
+  mkDefWeights,
+
+  -- * Boltzmann samplers
   BoltzmannSampler (..),
   rejectionSampler,
   toleranceRejectionSampler,
+  mkBoltzmannSampler,
+  mkDefBoltzmannSampler,
   hoistBoltzmannSampler,
-  mkDefWeights,
+
+  -- * Buffon machines
   BuffonMachine,
   EvalIO (..),
   eval,
