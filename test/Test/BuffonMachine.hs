@@ -1,4 +1,4 @@
-module Test.Unit.BuffonMachine (unitTests) where
+module Test.BuffonMachine (tests) where
 
 import Control.Monad (replicateM)
 import Data.Boltzmann.BuffonMachine (Distribution (..), choice, evalIO)
@@ -15,16 +15,16 @@ import Test.Tasty.HUnit (
   testCase,
  )
 
-unitTests :: TestTree
-unitTests =
+tests :: TestTree
+tests =
   testGroup
-    "BuffonMachine unit tests"
+    "BuffonMachine tests"
     [choiceTests]
 
 choiceTests :: TestTree
 choiceTests =
   testGroup
-    "Choice unit tests"
+    "Choice tests"
     [ testCase "[1/2, 1/2] is correctly sampled from" $ do
         [(0, a), (1, b)] <- choiceTest distributionA 1_000_000
         a `almostEqual` 0.5

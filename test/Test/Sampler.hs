@@ -1,4 +1,4 @@
-module Test.Unit.Sampler (unitTests) where
+module Test.Sampler (tests) where
 
 import Test.Samplers.BinTree (BinTree)
 import Test.Samplers.Lambda (BinLambda, Lambda)
@@ -8,8 +8,8 @@ import Test.Utils (Size (size))
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.QuickCheck as QC (testProperty)
 
-unitTests :: TestTree
-unitTests =
+tests :: TestTree
+tests =
   testGroup
     "Sampler tests"
     [ QC.testProperty "BinTree sampler respects size constraints" $
