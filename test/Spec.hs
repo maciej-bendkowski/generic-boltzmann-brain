@@ -1,5 +1,5 @@
 import Test.Tasty (TestTree, defaultMain, testGroup)
-import qualified Test.Unit.BitOracle as BitOracle
+import qualified Test.Unit.BuffonMachine as BuffonMachine
 
 main :: IO ()
 main = defaultMain tests
@@ -9,4 +9,4 @@ tests = testGroup "Unit tests" unitTests
 
 unitTests :: [TestTree]
 unitTests =
-  [BitOracle.unitTests]
+  [BuffonMachine.unitTests]

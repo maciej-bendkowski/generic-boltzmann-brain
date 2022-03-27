@@ -9,7 +9,7 @@ module Data.Boltzmann (
   rejectionSampler,
   toleranceRejectionSampler,
   mkDefWeights,
-  BitOracle,
+  BuffonMachine,
   EvalIO (..),
   eval,
 ) where
@@ -36,8 +36,8 @@ import Data.Boltzmann.Sampler.TH (
   mkDefWeights,
  )
 
-import Data.Boltzmann.BitOracle (
-  BitOracle,
+import Data.Boltzmann.BuffonMachine (
+  BuffonMachine,
   EvalIO (..),
   eval,
  )

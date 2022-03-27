@@ -1,14 +1,14 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 -- |
--- Module      : Data.Boltzmann.BitOracle
+-- Module      : Data.Boltzmann.BuffonMachine
 -- Description :
 -- Copyright   : (c) Maciej Bendkowski, 2022
 -- License     : BSD3
 -- Maintainer  : maciej.bendkowski@gmail.com
 -- Stability   : experimental
-module Data.Boltzmann.BitOracle (
-  BitOracle,
+module Data.Boltzmann.BuffonMachine (
+  BuffonMachine,
   Discrete,
   Oracle (..),
   EvalIO (..),
@@ -67,18 +67,18 @@ regenerate oracle =
 
 -- |
 --  Buffon machines implemented as a `State` monad over `Oracle`.
-newtype BitOracle g a = MkBitOracle
+newtype BuffonMachine g a = MkBuffonMachine
   {runBitOracle :: State (Oracle g) a}
   deriving (Functor, Applicative, Monad) via State (Oracle g)
 
 class RandomGen g => EvalIO g where
-  evalIO :: BitOracle g a -> IO a
+  evalIO :: BuffonMachine g a -> IO a
 
-type Bern g = BitOracle g Bool
+type Bern g = BuffonMachine g Bool
 
 {-# INLINEABLE getBit #-}
 getBit :: RandomGen g => Bern g
-getBit = MkBitOracle $ do
+getBit = MkBuffonMachine $ do
   modify' regenerate
   oracle <- get
   put $ useBit oracle
@@ -86,12 +86,12 @@ getBit = MkBitOracle $ do
 
 -- |
 --  Random computations resulting in discrete random variables.
-type Discrete g = BitOracle g Int
+type Discrete g = BuffonMachine g Int
 
 -- |
 --  Runs the given random computation using the given random generator.
 {-# INLINEABLE eval #-}
-eval :: RandomGen g => BitOracle g a -> g -> a
+eval :: RandomGen g => BuffonMachine g a -> g -> a
 eval m g = evalState (runBitOracle m) (fresh g)
 
 instance EvalIO SMGen where

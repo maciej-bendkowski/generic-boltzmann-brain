@@ -1,7 +1,7 @@
-module Test.Unit.BitOracle (unitTests) where
+module Test.Unit.BuffonMachine (unitTests) where
 
 import Control.Monad (replicateM)
-import Data.Boltzmann.BitOracle (Distribution (..), choice, evalIO)
+import Data.Boltzmann.BuffonMachine (Distribution (..), choice, evalIO)
 import qualified Data.Map as Map
 import Data.Vector (fromList)
 import System.Random.SplitMix (SMGen)
@@ -18,7 +18,7 @@ import Test.Tasty.HUnit (
 unitTests :: TestTree
 unitTests =
   testGroup
-    "BitOracle unit tests"
+    "BuffonMachine unit tests"
     [choiceTests]
 
 choiceTests :: TestTree
