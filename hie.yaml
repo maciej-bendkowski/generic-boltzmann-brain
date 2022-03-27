@@ -3,32 +3,8 @@ cradle:
     - path: "./src"
       component: "generic-boltzmann-brain:lib"
 
-    - path: "./profile/BinTree/BinTreeProfile.hs"
-      component: "generic-boltzmann-brain:exe:binTreeProfile"
-
-    - path: "./profile/BinTree/BinTree.hs"
-      component: "generic-boltzmann-brain:exe:binTreeProfile"
-
-    - path: "./profile/BinTree/Paths_generic_boltzmann_brain.hs"
-      component: "generic-boltzmann-brain:exe:binTreeProfile"
-
-    - path: "./profile/Lambda/LambdaProfile.hs"
-      component: "generic-boltzmann-brain:exe:lambdaProfile"
-
-    - path: "./profile/Lambda/Lambda.hs"
-      component: "generic-boltzmann-brain:exe:lambdaProfile"
-
-    - path: "./profile/Lambda/Paths_generic_boltzmann_brain.hs"
-      component: "generic-boltzmann-brain:exe:lambdaProfile"
-
-    - path: "./profile/Tree/TreeProfile.hs"
-      component: "generic-boltzmann-brain:exe:treeProfile"
-
-    - path: "./profile/Tree/Tree.hs"
-      component: "generic-boltzmann-brain:exe:treeProfile"
-
-    - path: "./profile/Tree/Paths_generic_boltzmann_brain.hs"
-      component: "generic-boltzmann-brain:exe:treeProfile"
+    - path: "./internal"
+      component: "generic-boltzmann-brain:lib:generic-boltzmann-brain-internal"
 
     - path: "./test"
       component: "generic-boltzmann-brain:test:generic-boltzmann-brain-test"

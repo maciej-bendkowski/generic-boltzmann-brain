@@ -46,7 +46,7 @@ import Data.Boltzmann.System (
 import Data.Coerce (coerce)
 import Data.Default (def)
 import Data.Functor ((<&>))
-import Language.Haskell.TH (Exp (LamCaseE), Name, Q, Type (ListT))
+import Language.Haskell.TH (Exp (LamCaseE), Name, Q, Type (ArrowT, ListT))
 import Language.Haskell.TH.Datatype (
   ConstructorInfo (constructorFields, constructorName),
   DatatypeInfo (datatypeCons),
@@ -114,6 +114,34 @@ mkCoerce tv = do
       Plain tn -> ConT $ coerce tn
       List tn -> AppT ListT (ConT $ coerce tn)
 
+toTypeVariant :: Type -> SamplerGen TypeVariant
+toTypeVariant (ConT tn) = pure . Plain $ coerce tn
+toTypeVariant (AppT ListT (ConT tn)) = pure . List $ coerce tn
+toTypeVariant typ = fail $ "Unsupported type " ++ show typ
+
+mkConstrCoerce :: TypeVariant -> ConstructorInfo -> SamplerGen Exp
+mkConstrCoerce tv info = do
+  typeVariants <- mapM toTypeVariant (constructorFields info)
+  let constrType = foldr arr (convert tv) (map convert typeVariants)
+
+  typSynonym <- findTypeSyn tv
+  synonyms <- mapM findTypeSyn typeVariants
+  let constrSynType = foldr arr typSynonym synonyms
+
+  let fromType = constrType
+      toType = constrSynType
+
+  coerce' <- lift [|coerce|]
+  pure $ AppTypeE (AppTypeE coerce' fromType) toType
+  where
+    convert :: TypeVariant -> Type
+    convert = \case
+      Plain tn -> ConT $ coerce tn
+      List tn -> AppT ListT (ConT $ coerce tn)
+
+    arr :: Type -> Type -> Type
+    arr a = AppT (AppT ArrowT a)
+
 mkPat :: String -> Q Pat
 mkPat = pure . VarP . mkName
 
@@ -125,12 +153,12 @@ mkCon = pure . ConE . coerce
 
 mkCaseConstr :: TypeVariant -> SamplerGen Exp
 mkCaseConstr = \case
-  Plain tn -> do
+  tv@(Plain tn) -> do
     typInfo <- lift $ reifyDatatype (coerce tn)
     let constrInfo = datatypeCons typInfo
         constrGroup = zip constrInfo [0 :: Integer ..]
 
-    caseMatches <- mapM (mkCaseMatch tn) constrGroup
+    caseMatches <- mapM (mkCaseMatch tv) constrGroup
     pure $ LamCaseE caseMatches
   tv -> do
     coerceExp <- mkCoerce tv
@@ -144,10 +172,10 @@ mkCaseConstr = \case
             pure ($(pure coerceExp) (x : xs), w + ws)
         |]
 
-mkCaseMatch :: TypeName -> (ConstructorInfo, Integer) -> SamplerGen Match
-mkCaseMatch typ (constr, idx) = do
+mkCaseMatch :: TypeVariant -> (ConstructorInfo, Integer) -> SamplerGen Match
+mkCaseMatch tv (constr, idx) = do
   let n' = LitP $ IntegerL idx
-  conExpr <- mkConExpr typ constr
+  conExpr <- mkConExpr tv constr
   pure $ Match n' (NormalB conExpr) []
 
 data ArgExp = ArgExp
@@ -209,24 +237,23 @@ mkArgExpr constr = do
       name <- lift $ newName s
       pure (VarP name, VarE name)
 
-mkConExpr :: TypeName -> ConstructorInfo -> SamplerGen Exp
-mkConExpr typ constr = do
+mkConExpr :: TypeVariant -> ConstructorInfo -> SamplerGen Exp
+mkConExpr tv constr = do
   ArgExp {..} <- mkArgExpr constr
   let constrName = MkConstructorName (constructorName constr)
   constrWeight <- getWeight $ coerce constrName
 
   constrExp <- lift $ mkCon constrName
-  exp <- lift . pure $ foldl AppE constrExp args
+  coercedConstrExp <- mkConstrCoerce tv constr
+  exp <- lift . pure $ foldl AppE (AppE coercedConstrExp constrExp) args
 
-  coerceExp <- mkCoerce (Plain typ) -- TODO(mbendkowski): FIX
-  object <- lift [|$(pure coerceExp) $(pure exp)|]
   weightExp <- lift [|$(Lift.lift constrWeight) + $(pure weight)|]
 
-  pureExp <- lift [|pure ($(pure object), $(pure weightExp))|]
+  pureExp <- lift [|pure ($(pure exp), $(pure weightExp))|]
   pure $ DoE Nothing (stmts <> [NoBindS pureExp])
 
 mkGuard :: SamplerGen Exp
-mkGuard = lift [|guard ($(mkVar "ub") > 0)|]
+mkGuard = lift [|guard ($(mkVar "ub") >= 0)|]
 
 mkChoice :: TypeVariant -> SamplerGen Exp
 mkChoice typ = do

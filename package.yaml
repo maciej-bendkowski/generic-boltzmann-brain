@@ -83,86 +83,6 @@ internal-libraries:
       ScopedTypeVariables
      Rank2Types
 
-executables:
-  binTreeProfile:
-    main:        BinTreeProfile.hs
-    source-dirs: profile/BinTree
-    ghc-options:
-    - -O2
-    - -Wall
-    - -Wcompat
-    - -Wmissing-export-lists
-    - -Wincomplete-record-updates
-    - -Wincomplete-uni-patterns
-    - -Wredundant-constraints
-    - -Wno-name-shadowing
-    - -fwarn-missing-signatures
-    - -ddump-splices
-    dependencies:
-    - generic-boltzmann-brain
-    default-extensions:
-      NumericUnderscores
-      LambdaCase
-      BangPatterns
-      DerivingVia
-      FlexibleInstances
-      UndecidableInstances
-      TypeApplications
-      ScopedTypeVariables
-      Rank2Types
-  treeProfile:
-    main:        TreeProfile.hs
-    source-dirs: profile/Tree
-    ghc-options:
-    - -O2
-    - -Wall
-    - -Wcompat
-    - -Wmissing-export-lists
-    - -Wincomplete-record-updates
-    - -Wincomplete-uni-patterns
-    - -Wredundant-constraints
-    - -Wno-name-shadowing
-    - -fwarn-missing-signatures
-    - -ddump-splices
-    dependencies:
-    - generic-boltzmann-brain
-    default-extensions:
-      NumericUnderscores
-      LambdaCase
-      BangPatterns
-      DerivingVia
-      FlexibleInstances
-      UndecidableInstances
-      TypeApplications
-      ScopedTypeVariables
-      Rank2Types
-  lambdaProfile:
-    main:        LambdaProfile.hs
-    source-dirs: profile/Lambda
-    ghc-options:
-    - -O2
-    - -Wall
-    - -Wcompat
-    - -Wmissing-export-lists
-    - -Wincomplete-record-updates
-    - -Wincomplete-uni-patterns
-    - -Wredundant-constraints
-    - -Wno-name-shadowing
-    - -fwarn-missing-signatures
-    - -ddump-splices
-    dependencies:
-    - generic-boltzmann-brain
-    default-extensions:
-      NumericUnderscores
-      LambdaCase
-      BangPatterns
-      DerivingVia
-      FlexibleInstances
-      UndecidableInstances
-      TypeApplications
-      ScopedTypeVariables
-      Rank2Types
-
 tests:
   generic-boltzmann-brain-test:
     main:                Spec.hs
@@ -177,6 +97,7 @@ tests:
     - -Wredundant-constraints
     - -Wno-name-shadowing
     - -fwarn-missing-signatures
+    - -ddump-splices
     dependencies:
     - generic-boltzmann-brain-internal
     - generic-boltzmann-brain

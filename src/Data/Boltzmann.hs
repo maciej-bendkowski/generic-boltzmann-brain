@@ -8,11 +8,14 @@ module Data.Boltzmann (
 
   -- * Boltzmann samplers
   BoltzmannSampler (..),
+  LowerBound (..),
+  UpperBound (..),
   rejectionSampler,
   toleranceRejectionSampler,
   mkBoltzmannSampler,
   mkDefBoltzmannSampler,
-  hoistBoltzmannSampler,
+  hoistRejectionSampler,
+  hoistToleranceRejectionSampler,
 
   -- * Buffon machines
   BuffonMachine,
@@ -34,7 +37,10 @@ import Data.Boltzmann.System.TH (
 
 import Data.Boltzmann.Sampler (
   BoltzmannSampler (..),
-  hoistBoltzmannSampler,
+  LowerBound (..),
+  UpperBound (..),
+  hoistRejectionSampler,
+  hoistToleranceRejectionSampler,
   rejectionSampler,
   toleranceRejectionSampler,
  )
