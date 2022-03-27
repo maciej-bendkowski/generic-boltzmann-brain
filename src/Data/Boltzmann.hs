@@ -8,6 +8,7 @@ module Data.Boltzmann (
   BoltzmannSampler (..),
   rejectionSampler,
   toleranceRejectionSampler,
+  hoistBoltzmannSampler,
   mkDefWeights,
   BuffonMachine,
   EvalIO (..),
@@ -28,6 +29,7 @@ import Data.Boltzmann.System.TH (
 
 import Data.Boltzmann.Sampler (
   BoltzmannSampler (..),
+  hoistBoltzmannSampler,
   rejectionSampler,
   toleranceRejectionSampler,
  )
