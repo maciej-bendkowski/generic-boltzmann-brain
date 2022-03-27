@@ -21,7 +21,7 @@ import Language.Haskell.TH.Syntax (
  )
 
 import Control.Monad (foldM, forM, replicateM, unless)
-import Data.Boltzmann.BuffonMachine (Distribution (Distribution))
+import Data.Boltzmann.BuffonMachine (Distribution (MkDistribution))
 import qualified Data.Map as Map
 import Data.Map.Strict (Map)
 import Data.Maybe (fromJust, fromMaybe)
@@ -284,7 +284,7 @@ data Distributions a = Distributions
 
 mkDidtributions :: Params -> Spec (Distributions a)
 mkDidtributions params = do
-  let mkDistribution = Distribution . fromList . fromJust
+  let mkDistribution = MkDistribution . fromList . fromJust
 
   regDdgs <- forM (Map.toList $ typeVariable params) $ \(name, v) -> do
     ddgTree <- ddg v

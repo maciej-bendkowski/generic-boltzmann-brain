@@ -102,7 +102,7 @@ instance EvalIO StdGen where
   {-# INLINE evalIO #-}
   evalIO m = eval m <$> getStdGen
 
-newtype Distribution = Distribution {unDistribution :: Vector Int}
+newtype Distribution = MkDistribution {unDistribution :: Vector Int}
   deriving stock (Show)
 
 deriveLift ''Distribution
