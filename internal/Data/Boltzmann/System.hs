@@ -282,8 +282,8 @@ data Distributions a = Distributions
   }
   deriving stock (Show)
 
-mkDidtributions :: Params -> Spec (Distributions a)
-mkDidtributions params = do
+mkDistributions :: Params -> Spec (Distributions a)
+mkDistributions params = do
   let mkDistribution = MkDistribution . fromList . fromJust
 
   regDdgs <- forM (Map.toList $ typeVariable params) $ \(name, v) -> do
@@ -324,7 +324,7 @@ paganiniSpec sys (Types regTypes listTypes) = do
   let (Let t) = varDefs Map.! targetType sys
 
   tune t -- tune for target variable.
-  mkDidtributions params
+  mkDistributions params
 
 paganiniSpecIO ::
   System ->
