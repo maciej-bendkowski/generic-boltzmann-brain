@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Test.Samplers.Tree (Tree (..), size) where
+module Test.Samplers.Tree (Tree (..)) where
 
 import Data.Boltzmann (
   BoltzmannSampler (..),
@@ -12,15 +12,16 @@ import Data.Boltzmann (
  )
 import GHC.Generics (Generic)
 import Test.QuickCheck (Arbitrary (arbitrary, shrink))
+import Test.Utils (Size(size))
 
 data Tree = T [Tree]
   deriving (Generic, Show)
 
 mkDefBoltzmannSampler ''Tree 2000
 
-size :: Tree -> Int
-size = \case
-  T ts -> 1 + sum (map size ts)
+instance Size Tree where
+  size = \case
+    T ts -> 1 + sum (map size ts)
 
 instance Arbitrary Tree where
   arbitrary =

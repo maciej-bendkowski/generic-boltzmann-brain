@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Test.Samplers.BinTree (BinTree (..), size) where
+module Test.Samplers.BinTree (BinTree (..)) where
 
 import Data.Boltzmann (
   BoltzmannSampler (..),
@@ -16,16 +16,17 @@ import Data.Boltzmann (
 import Data.Default (def)
 import GHC.Generics (Generic)
 import Test.QuickCheck (Arbitrary (arbitrary, shrink))
+import Test.Utils (Size(size))
 
 data BinTree
   = Leaf
   | Node BinTree BinTree
   deriving (Generic, Show)
 
-size :: BinTree -> Int
-size = \case
-  Leaf -> 0
-  Node lt rt -> 1 + size lt + size rt
+instance Size BinTree where
+  size = \case
+    Leaf -> 0
+    Node lt rt -> 1 + size lt + size rt
 
 mkBoltzmannSampler
   System

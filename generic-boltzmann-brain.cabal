@@ -92,6 +92,7 @@ test-suite generic-boltzmann-brain-test
       Test.Samplers.Tree
       Test.Unit.BuffonMachine
       Test.Unit.Sampler
+      Test.Utils
       Paths_generic_boltzmann_brain
   hs-source-dirs:
       test
