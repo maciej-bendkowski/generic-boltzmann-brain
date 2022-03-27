@@ -8,12 +8,17 @@
 -- Maintainer  : maciej.bendkowski@gmail.com
 -- Stability   : experimental
 module Data.Boltzmann.BuffonMachine (
+  -- * Buffon machines
   BuffonMachine,
-  Discrete,
-  Oracle (..),
+  Oracle,
   EvalIO (..),
   eval,
-  getBit,
+
+  -- * Random variables
+  Discrete,
+  Bern,
+
+  -- * Discrete distribution generating trees
   Distribution (..),
   choice,
 ) where
@@ -71,9 +76,8 @@ newtype BuffonMachine g a = MkBuffonMachine
   {runBitOracle :: State (Oracle g) a}
   deriving (Functor, Applicative, Monad) via State (Oracle g)
 
-class RandomGen g => EvalIO g where
-  evalIO :: BuffonMachine g a -> IO a
-
+-- |
+--  Buffon machines computing Bernoulli random variables.
 type Bern g = BuffonMachine g Bool
 
 {-# INLINEABLE getBit #-}
@@ -85,14 +89,20 @@ getBit = MkBuffonMachine $ do
   pure $ currentBit oracle
 
 -- |
---  Random computations resulting in discrete random variables.
+--  Buffon machines computing discrete random variables.
 type Discrete g = BuffonMachine g Int
 
 -- |
---  Runs the given random computation using the given random generator.
+--  Runs the Buffon machine using the given random generator.
 {-# INLINEABLE eval #-}
 eval :: RandomGen g => BuffonMachine g a -> g -> a
 eval m g = evalState (runBitOracle m) (fresh g)
+
+-- |
+--  Random generators which can be lifted to IO
+--  and used to run Buffon machine computations.
+class RandomGen g => EvalIO g where
+  evalIO :: BuffonMachine g a -> IO a
 
 instance EvalIO SMGen where
   {-# INLINE evalIO #-}
@@ -102,13 +112,14 @@ instance EvalIO StdGen where
   {-# INLINE evalIO #-}
   evalIO m = eval m <$> getStdGen
 
+-- | Discrete distribution generating trees in vector form.
 newtype Distribution = MkDistribution {unDistribution :: Vector Int}
   deriving stock (Show)
 
 deriveLift ''Distribution
 
 -- |
---  Given a compact discrete distribution generating tree (in vector form)
+--  Given a compact discrete distribution generating tree in vector form,
 --  computes a discrete random variable following that distribution.
 choice :: RandomGen g => Distribution -> Discrete g
 choice enc
