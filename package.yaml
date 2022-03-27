@@ -185,6 +185,7 @@ tests:
     - tasty-quickcheck >= 0.10.0
     - QuickCheck >= 2.14.2
     default-extensions:
+      NumericUnderscores
       LambdaCase
       BangPatterns
       DerivingVia

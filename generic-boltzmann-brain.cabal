@@ -176,7 +176,7 @@ test-suite generic-boltzmann-brain-test
   hs-source-dirs:
       test
   default-extensions:
-      LambdaCase BangPatterns DerivingVia FlexibleInstances UndecidableInstances TypeApplications ScopedTypeVariables Rank2Types
+      NumericUnderscores LambdaCase BangPatterns DerivingVia FlexibleInstances UndecidableInstances TypeApplications ScopedTypeVariables Rank2Types
   ghc-options: -O2 -Wall -Wcompat -Wmissing-export-lists -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -Wno-name-shadowing -fwarn-missing-signatures
   build-depends:
       QuickCheck >=2.14.2
