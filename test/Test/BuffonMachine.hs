@@ -10,10 +10,9 @@ import Test.Tasty (
   testGroup,
  )
 import Test.Tasty.HUnit (
-  Assertion,
-  assertBool,
   testCase,
  )
+import Test.Utils (almostEqual)
 
 tests :: TestTree
 tests =
@@ -67,7 +66,3 @@ choiceTest dist n = evalIO $ do
 
 frequency :: (Ord a) => [a] -> [(a, Int)]
 frequency xs = Map.toList (Map.fromListWith (+) [(x, 1) | x <- xs])
-
-almostEqual :: (Show a, Ord a, Fractional a) => a -> a -> Assertion
-almostEqual a b =
-  assertBool ("Was " ++ show a ++ " " ++ show b) $ abs (a - b) < 0.01

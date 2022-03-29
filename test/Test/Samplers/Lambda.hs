@@ -5,6 +5,7 @@ module Test.Samplers.Lambda (
   DeBruijn (..),
   Lambda (..),
   BinLambda (..),
+  abstractions,
 ) where
 
 import Data.Boltzmann (
@@ -20,7 +21,7 @@ import Data.Boltzmann (
 import Data.Default (def)
 import GHC.Generics (Generic)
 import Test.QuickCheck (Arbitrary (arbitrary, shrink))
-import Test.Utils (Size(size))
+import Test.Utils (Size (size))
 
 data DeBruijn
   = Z
@@ -36,6 +37,12 @@ data Lambda
   | App Lambda Lambda
   | Abs Lambda
   deriving (Generic, Show)
+
+abstractions :: Lambda -> Int
+abstractions = \case
+  Index _ -> 0
+  App lt rt -> abstractions lt + abstractions rt
+  Abs t -> 1 + abstractions t
 
 mkBoltzmannSampler
   System
