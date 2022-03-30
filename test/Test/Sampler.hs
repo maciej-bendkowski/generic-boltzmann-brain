@@ -10,7 +10,7 @@ import Data.Boltzmann (
 
 import Test.Samplers.BinTree (BinTree)
 import Test.Samplers.Lambda (BinLambda, Lambda, abstractions)
-import Test.Samplers.Tree (Tree)
+import Test.Samplers.Tree (Tree, Tree')
 
 import System.Random.SplitMix (SMGen)
 
@@ -35,6 +35,10 @@ tests =
         \tree ->
           let s = size @Tree tree
            in 1600 <= s && s <= 2400
+    , QC.testProperty "Tree' sampler respects size constraints" $
+        \tree ->
+          let s = size @Tree' tree
+           in 8500 <= s && s <= 11_150
     , QC.testProperty "Lambda sampler respects size constraints" $
         \term ->
           let s = size @Lambda term

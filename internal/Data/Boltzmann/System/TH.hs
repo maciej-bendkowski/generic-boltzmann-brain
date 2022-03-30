@@ -100,20 +100,6 @@ getWeight constr = do
   weightResolver <- asks constructorWeight
   lift $ weightResolver `unWeightResolver` constr
 
-mkCoerce :: TypeVariant -> SamplerGen Exp
-mkCoerce tv = do
-  typSynonym <- findTypeSyn tv
-  let fromType = convert tv
-      toType = typSynonym
-
-  coerce' <- lift [|coerce|]
-  pure $ AppTypeE (AppTypeE coerce' fromType) toType
-  where
-    convert :: TypeVariant -> Type
-    convert = \case
-      Plain tn -> ConT $ coerce tn
-      List tn -> AppT ListT (ConT $ coerce tn)
-
 toTypeVariant :: Type -> SamplerGen TypeVariant
 toTypeVariant (ConT tn) = pure . Plain $ coerce tn
 toTypeVariant (AppT ListT (ConT tn)) = pure . List $ coerce tn
@@ -160,17 +146,25 @@ mkCaseConstr = \case
 
     caseMatches <- mapM (mkCaseMatch tv) constrGroup
     pure $ LamCaseE caseMatches
-  tv -> do
-    coerceExp <- mkCoerce tv
-    lift
-      [|
-        \case
-          0 -> pure ([], 0)
-          1 -> do
-            (x, w) <- sample ub
-            (xs, ws) <- sample (ub - w)
-            pure ($(pure coerceExp) (x : xs), w + ws)
-        |]
+  tv@(List tn) ->
+    do
+      typSynonym <- findTypeSyn (Plain tn)
+      listTypSynonym <- findTypeSyn tv
+
+      lift
+        [|
+          \case
+            0 -> pure ([], 0)
+            1 -> do
+              (x, w) <- $(sampleExp typSynonym) ub
+              (xs, ws) <- $(sampleExp listTypSynonym) (ub - w)
+              pure ((x : xs), w + ws)
+          |]
+
+sampleExp :: Type -> Q Exp
+sampleExp t = do
+  sample' <- [|sample|]
+  pure $ AppTypeE sample' t
 
 mkCaseMatch :: TypeVariant -> (ConstructorInfo, Integer) -> SamplerGen Match
 mkCaseMatch tv (constr, idx) = do
