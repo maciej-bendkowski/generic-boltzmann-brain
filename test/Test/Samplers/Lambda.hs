@@ -85,7 +85,7 @@ mkBoltzmannSampler
   System
     { targetType = ''BinLambda
     , meanSize = 6_000
-    , frequencies = def
+    , frequencies = ('Abs, 2340) <:> def
     , weights =
         ('Index, 0)
           <:> ('App, 2)
