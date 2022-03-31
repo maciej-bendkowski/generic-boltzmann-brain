@@ -28,7 +28,7 @@ data BinTree
 one can construct a corresponding Boltzmann sampler in a single line of code
 
 ``` hs
-mkDefBoltzmannSampler ''Tree 1000
+mkDefBoltzmannSampler ''BinTree 1000
 ```
 
 which makes `BinTree` an instance of the `BoltzmannSampler` type class:
