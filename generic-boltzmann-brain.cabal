@@ -30,7 +30,7 @@ library
   other-modules:
       Paths_generic_boltzmann_brain
   hs-source-dirs:
-      src
+      api
   default-extensions:
       LambdaCase BangPatterns DerivingVia FlexibleInstances UndecidableInstances TypeApplications ScopedTypeVariables Rank2Types
   ghc-options: -O2 -Wall -Wcompat -Wmissing-export-lists -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -Wno-name-shadowing -fwarn-missing-signatures

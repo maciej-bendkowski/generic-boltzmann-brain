@@ -35,7 +35,7 @@ dependencies:
 - data-default >= 0.7.1.1
 
 library:
-    source-dirs: src
+    source-dirs: api
     exposed-modules:
       Data.Boltzmann
     dependencies:
