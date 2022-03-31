@@ -29,6 +29,7 @@ import Data.Boltzmann.System (
   Types (Types, regTypes),
   collectTypes,
   collectTypes',
+  hasNonNegativeEntries,
   hasProperConstructors,
   hasProperFrequencies,
   paganiniSpecIO,
@@ -184,6 +185,7 @@ mkSystemCtx sys = do
 
   hasProperConstructors sys'
   hasProperFrequencies sys'
+  hasNonNegativeEntries sys'
 
   types <- collectTypes sys'
   distributions <- runIO $ do

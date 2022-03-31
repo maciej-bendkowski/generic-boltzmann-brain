@@ -19,6 +19,7 @@ module Data.Boltzmann.System (
   paganiniSpecIO,
   hasProperConstructors,
   hasProperFrequencies,
+  hasNonNegativeEntries,
   Constructable (..),
 ) where
 
@@ -229,6 +230,33 @@ hasProperFrequencies sys = do
     fail $
       "Frequencies definied for non-system constructors: "
         ++ format additionalConstrs
+
+hasNonNegativeEntries :: System -> Q ()
+hasNonNegativeEntries sys = do
+  unless (meanSize sys >= 0) $ do
+    fail "Negative mean target size"
+
+  let negativeWeights =
+        filter
+          (\(_, w) -> w < 0)
+          (unConstructorWeights $ weights sys)
+
+  unless (null negativeWeights) $ do
+    fail $
+      "Negative weight for constructors: "
+        ++ format (Set.fromList $ map fst negativeWeights)
+
+  let negativeFrequencies =
+        filter
+          (\(_, w) -> w < 0)
+          (unConstructorFrequencies $ frequencies sys)
+
+  unless (null negativeFrequencies) $ do
+    fail $
+      "Negative frequencies for constructors: "
+        ++ format (Set.fromList $ map fst negativeFrequencies)
+
+  pure ()
 
 mkVariables :: Set Name -> Spec (Map Name Let)
 mkVariables sys = do
