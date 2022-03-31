@@ -161,8 +161,8 @@ We recommend using `stack` for compiling `generic-boltzmann-brain` sources.
 ### Known limitations
 
 - Polymorphic data types are *not* supported.
-- Non-algebraic data type specification are currently *not* supported, though
-  some of their extensions, such as some *Pólya structures* are *feasible*.
+- Non-algebraic data type specifications are currently *not* supported, though
+  some of their extensions, such as certain *Pólya structures* are *feasible*.
 - Nested lists such as `[[Lambda]]` are *not* supported, even though lists such
   as `[Lambda]` are. Note however that this is not a conceptual limitation, and
   could be supported in future versions of `generic-boltzmann-brain`.
