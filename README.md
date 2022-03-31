@@ -152,7 +152,7 @@ mkBoltzmannSampler
 Currently, no pre-compiled binaries are available.
 
 `generic-boltzmann-brain` uses an external [Python](https://www.python.org/) library
-called [Paganini](https://github.com/maciej-bendkowski/paganini) to the construction
+called [Paganini](https://github.com/maciej-bendkowski/paganini) to do the construction
 of Boltzmann samplers. `Python` with available `paganini` are expected to be executable
 and present in the `PATH`.
 
