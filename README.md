@@ -19,6 +19,8 @@ inhabitants of user-declared algebraic data types. For instance, given the
 following `BinTree` data type
 
 ```hs
+import Data.Boltzmann
+
 data BinTree
   = Leaf
   | Node BinTree BinTree
