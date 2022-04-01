@@ -24,7 +24,7 @@ import Data.Boltzmann
 data BinTree
   = Leaf
   | Node BinTree BinTree
-  deriving (Generic, Show)
+  deriving (Show)
 ```
 
 one can construct a corresponding Boltzmann sampler in a single line of code
@@ -82,13 +82,13 @@ Consider the following example of lambda terms in [DeBruijn notation](https://en
 data DeBruijn
   = Z
   | S DeBruijn
-  deriving (Generic, Show)
+  deriving (Show)
 
 data Lambda
   = Index DeBruijn
   | App Lambda Lambda
   | Abs Lambda
-  deriving (Generic, Show)
+  deriving (Show)
 ```
 
 Suppose that we want a size notion where all constructors have weight
@@ -135,7 +135,7 @@ notions are required. Simply create a `newtype` wrapper and generate a let
 
 ``` hs
 newtype BinLambda = MkBinLambda Lambda
-  deriving (Generic, Show)
+  deriving (Show)
 
 mkBoltzmannSampler
   System
