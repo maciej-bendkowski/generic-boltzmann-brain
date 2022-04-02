@@ -19,20 +19,20 @@ category:            Data, Generic, Random
 description:         Please see the README on GitHub at <https://github.com/maciej-bendkowski/generic-boltzmann-brain#readme>
 
 dependencies:
-- base >= 4.7 && < 5
-- containers >= 0.6.4
-- vector >= 0.12.3.1
-- random >= 1.2.0
-- transformers >= 0.5.6
-- template-haskell >= 2.17.0.0
-- th-abstraction >= 0.4.3.0
-- th-lift-instances >= 0.1.18
-- th-lift >= 0.8.2
-- mtl >= 2.2.2
-- paganini-hs >= 0.3.0.0
-- QuickCheck >= 2.14.2
-- splitmix >= 0.1.0.4
-- data-default >= 0.7.1.1
+- base
+- containers
+- vector
+- random
+- transformers
+- template-haskell
+- th-abstraction
+- th-lift-instances
+- th-lift
+- mtl
+- paganini-hs
+- QuickCheck
+- splitmix
+- data-default
 
 library:
     source-dirs: api
@@ -110,9 +110,10 @@ benchmarks:
       Rank2Types
     dependencies:
     - generic-boltzmann-brain
-    - criterion >= 1.5.12.0
-    - deepseq >= 1.4.5.0
-    - QuickCheck >= 2.14.2
+    - criterion
+    - deepseq
+    - QuickCheck
+    - testing-feat
 
 tests:
   generic-boltzmann-brain-test:
@@ -132,10 +133,10 @@ tests:
     dependencies:
     - generic-boltzmann-brain-internal
     - generic-boltzmann-brain
-    - tasty >= 1.4.2
-    - tasty-hunit >= 0.10.0
-    - tasty-quickcheck >= 0.10.0
-    - QuickCheck >= 2.14.2
+    - tasty
+    - tasty-hunit
+    - tasty-quickcheck
+    - QuickCheck
     default-extensions:
       NumericUnderscores
       LambdaCase
