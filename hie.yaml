@@ -1,6 +1,6 @@
 cradle:
   stack:
-    - path: "./src"
+    - path: "./api"
       component: "generic-boltzmann-brain:lib"
 
     - path: "./internal"
@@ -8,3 +8,9 @@ cradle:
 
     - path: "./test"
       component: "generic-boltzmann-brain:test:generic-boltzmann-brain-test"
+
+    - path: "./bench/Main.hs"
+      component: "generic-boltzmann-brain:bench:generic-boltzmann-brain"
+
+    - path: "./bench/Paths_generic_boltzmann_brain.hs"
+      component: "generic-boltzmann-brain:bench:generic-boltzmann-brain"

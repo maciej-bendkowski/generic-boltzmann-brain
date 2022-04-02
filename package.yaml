@@ -81,7 +81,38 @@ internal-libraries:
       UndecidableInstances
       TypeApplications
       ScopedTypeVariables
-     Rank2Types
+      Rank2Types
+
+benchmarks:
+  generic-boltzmann-brain:
+    source-dirs: bench
+    main:        Main.hs
+    ghc-options:
+    - -O2
+    - -Wall
+    - -Wcompat
+    - -Wmissing-export-lists
+    - -Wincomplete-record-updates
+    - -Wincomplete-uni-patterns
+    - -Wredundant-constraints
+    - -Wno-name-shadowing
+    - -fwarn-missing-signatures
+    - -ddump-splices
+    default-extensions:
+      NumericUnderscores
+      LambdaCase
+      BangPatterns
+      DerivingVia
+      FlexibleInstances
+      UndecidableInstances
+      TypeApplications
+      ScopedTypeVariables
+      Rank2Types
+    dependencies:
+    - generic-boltzmann-brain
+    - criterion >= 1.5.12.0
+    - deepseq >= 1.4.5.0
+    - QuickCheck >= 2.14.2
 
 tests:
   generic-boltzmann-brain-test:
