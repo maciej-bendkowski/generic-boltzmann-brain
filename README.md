@@ -63,7 +63,7 @@ in that respect closely related to QuickCheck's generator type `Gen a` to which
 it can be converted through, e.g.:
 
 ``` hs
-hoistRejectionSampler ::
+quickCheckRejectionSampler ::
   BoltzmannSampler a => (Int -> (LowerBound, UpperBound)) -> Gen a
 ```
 

@@ -39,6 +39,7 @@ packages:
 #
 extra-deps:
 - criterion-1.5.12.0
+- testing-feat-1.1.0.0
 - git: https://github.com/maciej-bendkowski/paganini-hs
   commit: 941e8f6314ea49b79c2cf1a03924cbedc981917e
 - git: https://github.com/OctopiChalmers/BinderAnn

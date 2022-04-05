@@ -9,7 +9,7 @@ import Data.Boltzmann (
   LowerBound (MkLowerBound),
   System (..),
   UpperBound (MkUpperBound),
-  hoistRejectionSampler,
+  quickCheckRejectionSampler,
   mkBoltzmannSampler,
   mkDefWeights,
  )
@@ -40,6 +40,6 @@ mkBoltzmannSampler
 
 instance Arbitrary BinTree where
   arbitrary =
-    hoistRejectionSampler $
+    quickCheckRejectionSampler $
       const (MkLowerBound 800, MkUpperBound 1200)
   shrink = const []

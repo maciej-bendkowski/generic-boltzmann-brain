@@ -12,6 +12,13 @@ packages:
   original:
     hackage: criterion-1.5.12.0
 - completed:
+    hackage: testing-feat-1.1.0.0@sha256:7c7629c5014edf06aefbf30a061d1ee64c6ee15f438d868e34749fb22208ab0b,2466
+    pantry-tree:
+      size: 790
+      sha256: 444f3c68a4f4fa1488fbbe9e8d9bbcc5f226b12a5027ee93683d5f95bf0ece28
+  original:
+    hackage: testing-feat-1.1.0.0
+- completed:
     name: paganini-hs
     version: 0.3.0.0
     git: https://github.com/maciej-bendkowski/paganini-hs

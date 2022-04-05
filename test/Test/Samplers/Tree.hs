@@ -9,7 +9,7 @@ import Data.Boltzmann (
   LowerBound (MkLowerBound),
   System (..),
   UpperBound (MkUpperBound),
-  hoistRejectionSampler,
+  quickCheckRejectionSampler,
   mkBoltzmannSampler,
   mkDefBoltzmannSampler,
   mkDefWeights,
@@ -30,7 +30,7 @@ instance Size Tree where
 
 instance Arbitrary Tree where
   arbitrary =
-    hoistRejectionSampler $
+    quickCheckRejectionSampler $
       const (MkLowerBound 1600, MkUpperBound 2400)
   shrink = const []
 
@@ -53,6 +53,6 @@ mkBoltzmannSampler
 
 instance Arbitrary Tree' where
   arbitrary =
-    hoistRejectionSampler $
+    quickCheckRejectionSampler $
       const (MkLowerBound 8500, MkUpperBound 11_150)
   shrink = const []

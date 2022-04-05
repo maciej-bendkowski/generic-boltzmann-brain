@@ -14,7 +14,7 @@ import Data.Boltzmann (
   LowerBound (MkLowerBound),
   System (..),
   UpperBound (MkUpperBound),
-  hoistRejectionSampler,
+  quickCheckRejectionSampler,
   mkBoltzmannSampler,
   mkDefWeights,
  )
@@ -67,7 +67,7 @@ instance Size Lambda where
 
 instance Arbitrary Lambda where
   arbitrary =
-    hoistRejectionSampler $
+    quickCheckRejectionSampler $
       const (MkLowerBound 8_000, MkUpperBound 12_000)
   shrink = const []
 
@@ -95,6 +95,6 @@ mkBoltzmannSampler
 
 instance Arbitrary BinLambda where
   arbitrary =
-    hoistRejectionSampler $
+    quickCheckRejectionSampler $
       const (MkLowerBound 5_000, MkUpperBound 6_400)
   shrink = const []

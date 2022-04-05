@@ -16,17 +16,18 @@ module Data.Boltzmann.Sampler (
   toleranceRejectionSampler,
 
   -- * Other utilities
-  hoistRejectionSampler,
-  hoistToleranceRejectionSampler,
+  quickCheckRejectionSampler,
+  quickCheckToleranceRejectionSampler,
 ) where
 
 import Control.Monad.Trans.Maybe (MaybeT, runMaybeT)
 import Data.Boltzmann.BuffonMachine (BuffonMachine, eval)
 import Data.Coerce (coerce)
 import System.Random (RandomGen)
-import Test.QuickCheck (Gen)
-import Test.QuickCheck.Gen (Gen (MkGen))
-import Test.QuickCheck.Random (QCGen (QCGen))
+
+import qualified Test.QuickCheck as QuickCheck (Gen)
+import qualified Test.QuickCheck.Gen as QuickCheck (Gen (MkGen))
+import qualified Test.QuickCheck.Random as QuickCheck (QCGen (QCGen))
 
 -- | Multiparametric Boltzmann samplers.
 class BoltzmannSampler a where
@@ -73,21 +74,26 @@ toleranceRejectionSampler n eps = rejectionSampler lb ub
     ub = MkUpperBound $ ceiling $ (1 + eps) * fromIntegral n
 
 -- |
---  Using the given tolerance, hoists a tolerance rejection sampler
+--  Using the given tolerance, maps a tolerance rejection sampler
 --  for @a@ to a Quickcheck generator @Gen a@.
-hoistRejectionSampler ::
+quickCheckRejectionSampler ::
   BoltzmannSampler a =>
   (Int -> (LowerBound, UpperBound)) ->
-  Gen a
-hoistRejectionSampler genBounds = MkGen $ \(QCGen g) n ->
-  let (lb, ub) = genBounds n
-      machine = rejectionSampler lb ub
-   in eval machine g
+  QuickCheck.Gen a
+quickCheckRejectionSampler genBounds = QuickCheck.MkGen $
+  \(QuickCheck.QCGen g) n ->
+    let (lb, ub) = genBounds n
+        machine = rejectionSampler lb ub
+     in eval machine g
 
 -- |
---  Using the given tolerance, hoists a tolerance rejection sampler
+--  Using the given tolerance, maps a tolerance rejection sampler
 --  for @a@ to a Quickcheck generator @Gen a@.
-hoistToleranceRejectionSampler :: BoltzmannSampler a => Double -> Gen a
-hoistToleranceRejectionSampler eps = MkGen $ \(QCGen g) n ->
-  let machine = toleranceRejectionSampler n eps
-   in eval machine g
+quickCheckToleranceRejectionSampler ::
+  BoltzmannSampler a =>
+  Double ->
+  QuickCheck.Gen a
+quickCheckToleranceRejectionSampler eps = QuickCheck.MkGen $
+  \(QuickCheck.QCGen g) n ->
+    let machine = toleranceRejectionSampler n eps
+     in eval machine g
