@@ -145,7 +145,6 @@ benchmark generic-boltzmann-brain
     , random
     , splitmix
     , template-haskell
-    , testing-feat
     , th-abstraction
     , th-lift
     , th-lift-instances

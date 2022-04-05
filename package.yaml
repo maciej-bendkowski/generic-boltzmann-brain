@@ -113,7 +113,6 @@ benchmarks:
     - criterion
     - deepseq
     - QuickCheck
-    - testing-feat
 
 tests:
   generic-boltzmann-brain-test:
