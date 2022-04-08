@@ -1,4 +1,4 @@
-# Generic Boltzmann Brain
+# Generic Boltzmann Brain [![License](https://img.shields.io/badge/license-BSD--3-orange.svg)](https://tldrlegal.com/license/bsd-3-clause-license-(revised))
 -------------------------
 
 `generic-boltzmann-brain` is a template Haskell library which allows its users
