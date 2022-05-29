@@ -11,6 +11,13 @@ Please bear in mind that the current project is still under active development
 and should therefore be treated as a working prototype. Comments, critique, and
 feature requests are most welcome.
 
+### Citing Generic Boltzmann Brain
+If you use *Generic Boltzmann Brain* or its components for published work,  we encourage you to cite the accompanying paper:
+
+*Maciej Bendkowski*
+
+[Automatic compile-time synthesis of entropy-optimal Boltzmann samplers](https://maciej-bendkowski.github.io/generic-boltzmann-brain.pdf)
+
 ### Quick overview
 
 `generic-boltzmann-brain` constructs [Boltzmann
