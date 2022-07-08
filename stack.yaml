@@ -20,7 +20,13 @@
 resolver:
   url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/18/16.yaml
 
-compiler: ghc-9.0.1
+compiler: ghc-9.0.2
+
+setup-info:
+  ghc:
+    linux64-tinfo6:
+      9.0.2:
+        url: "https://downloads.haskell.org/ghc/9.0.2/ghc-9.0.2a-x86_64-fedora27-linux.tar.xz"
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.

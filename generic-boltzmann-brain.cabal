@@ -1,6 +1,6 @@
 cabal-version: 2.0
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.34.7.
 --
 -- see: https://github.com/sol/hpack
 
@@ -28,6 +28,8 @@ library
   exposed-modules:
       Data.Boltzmann
   other-modules:
+      Paths_generic_boltzmann_brain
+  autogen-modules:
       Paths_generic_boltzmann_brain
   hs-source-dirs:
       api
@@ -60,6 +62,8 @@ library generic-boltzmann-brain-internal
       Data.Boltzmann.System
       Data.Boltzmann.System.TH
   other-modules:
+      Paths_generic_boltzmann_brain
+  autogen-modules:
       Paths_generic_boltzmann_brain
   hs-source-dirs:
       internal
@@ -94,6 +98,8 @@ test-suite generic-boltzmann-brain-test
       Test.Samplers.Tree
       Test.Utils
       Paths_generic_boltzmann_brain
+  autogen-modules:
+      Paths_generic_boltzmann_brain
   hs-source-dirs:
       test
   default-extensions:
@@ -126,6 +132,8 @@ benchmark generic-boltzmann-brain
   main-is: Main.hs
   other-modules:
       Lambda
+      Paths_generic_boltzmann_brain
+  autogen-modules:
       Paths_generic_boltzmann_brain
   hs-source-dirs:
       bench
