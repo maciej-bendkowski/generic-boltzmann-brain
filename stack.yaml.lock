@@ -5,45 +5,45 @@
 
 packages:
 - completed:
-    hackage: criterion-1.5.12.0@sha256:f9c8c0cff7d6796702849258b22df103cde5baa5ee1f085b6b59f37074ec303f,5273
     pantry-tree:
-      size: 2323
       sha256: 92034e3e490c5fe0eab10277f6e35534b37dc0962347025630380c7d37d99ca1
+      size: 2323
+    hackage: criterion-1.5.12.0@sha256:f9c8c0cff7d6796702849258b22df103cde5baa5ee1f085b6b59f37074ec303f,5273
   original:
     hackage: criterion-1.5.12.0
 - completed:
-    hackage: testing-feat-1.1.0.0@sha256:7c7629c5014edf06aefbf30a061d1ee64c6ee15f438d868e34749fb22208ab0b,2466
     pantry-tree:
-      size: 790
       sha256: 444f3c68a4f4fa1488fbbe9e8d9bbcc5f226b12a5027ee93683d5f95bf0ece28
+      size: 790
+    hackage: testing-feat-1.1.0.0@sha256:7c7629c5014edf06aefbf30a061d1ee64c6ee15f438d868e34749fb22208ab0b,2466
   original:
     hackage: testing-feat-1.1.0.0
 - completed:
     name: paganini-hs
-    version: 0.3.0.0
-    git: https://github.com/maciej-bendkowski/paganini-hs
     pantry-tree:
-      size: 949
-      sha256: c20a013dc0ceed7d03a3381d0e32b4122140e183b8b3f764b9fa493fda52bc5a
-    commit: 941e8f6314ea49b79c2cf1a03924cbedc981917e
-  original:
+      sha256: 0216477ed9bf54790ecfae68d9d28df7e541e03fac1fe600ac7caff72d210cee
+      size: 947
+    commit: f6f4f8d26c30544d17eab63583d4ff5e9158d2d9
     git: https://github.com/maciej-bendkowski/paganini-hs
-    commit: 941e8f6314ea49b79c2cf1a03924cbedc981917e
+    version: 0.4.0.0
+  original:
+    commit: f6f4f8d26c30544d17eab63583d4ff5e9158d2d9
+    git: https://github.com/maciej-bendkowski/paganini-hs
 - completed:
     name: BinderAnn
-    version: 0.1.0.0
-    git: https://github.com/OctopiChalmers/BinderAnn
     pantry-tree:
-      size: 1631
       sha256: 2e2b0b9828f0bd3698344940c4da689947b4530ae75ccc51b03c77db171244e3
+      size: 1631
     commit: 8f082b23ebd4e79e86e934f41ddfcba59652fadd
-  original:
     git: https://github.com/OctopiChalmers/BinderAnn
+    version: 0.1.0.0
+  original:
     commit: 8f082b23ebd4e79e86e934f41ddfcba59652fadd
+    git: https://github.com/OctopiChalmers/BinderAnn
 snapshots:
 - completed:
+    sha256: cdead65fca0323144b346c94286186f4969bf85594d649c49c7557295675d8a5
     size: 586286
     url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/18/16.yaml
-    sha256: cdead65fca0323144b346c94286186f4969bf85594d649c49c7557295675d8a5
   original:
     url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/18/16.yaml
