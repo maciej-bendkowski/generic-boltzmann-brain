@@ -4,13 +4,10 @@ cradle:
       component: "generic-boltzmann-brain:lib"
 
     - path: "./internal"
-      component: "generic-boltzmann-brain:lib:generic-boltzmann-brain-internal"
+      component: "generic-boltzmann-brain:lib"
 
     - path: "./test"
       component: "generic-boltzmann-brain:test:generic-boltzmann-brain-test"
 
-    - path: "./bench/Main.hs"
-      component: "generic-boltzmann-brain:bench:generic-boltzmann-brain"
-
-    - path: "./bench/Paths_generic_boltzmann_brain.hs"
+    - path: "./bench"
       component: "generic-boltzmann-brain:bench:generic-boltzmann-brain"
