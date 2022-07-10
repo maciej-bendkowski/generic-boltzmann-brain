@@ -178,11 +178,8 @@ We recommend using `stack` for compiling `generic-boltzmann-brain` sources.
 
 ### Related work
 
-As such, *generic-boltzmann-brain* is a twin project of
-[Boltzmann-brain](https://github.com/maciej-bendkowski/boltzmann-brain). If you
-are interested in generating standalone samplers out of a textual
-representation, consider using *boltzmann-brain* instead.
-
+As such, *generic-boltzmann-brain* is a continuation of (the now deprecated)
+[Boltzmann-brain](https://github.com/maciej-bendkowski/boltzmann-brain).
 `generic-boltzmann-brain` heavily relies on published work of numerous excellent
 authors. Below, you can find a short (and definitely inexhaustive) list of
 papers on the subject:
