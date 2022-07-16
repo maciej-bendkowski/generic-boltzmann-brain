@@ -95,6 +95,7 @@ test-suite generic-boltzmann-brain-test
       Test.Sampler
       Test.Samplers.BinTree
       Test.Samplers.Lambda
+      Test.Samplers.MotzkinTree
       Test.Samplers.Tree
       Test.Utils
       Paths_generic_boltzmann_brain
