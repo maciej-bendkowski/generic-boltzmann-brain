@@ -47,7 +47,7 @@ class BoltzmannSampler a where
   -- |
   --  Samples a random object of type @a@. If the object size is larger than
   --  the given upper bound parameter, @Nothing@ is returned instead.
-  sample :: RandomGen g => Int -> MaybeT (BuffonMachine g) (a, Int)
+  sample :: RandomGen g => MeanSize -> MaybeT (BuffonMachine g) (a, Int)
 ```
 
 The so created `sample` function implements a Boltzmann sampler for `BinTree`.

@@ -21,6 +21,7 @@ module Data.Boltzmann.System (
   hasProperFrequencies,
   hasNonNegativeEntries,
   Constructable (..),
+  MeanSize,
 ) where
 
 import Language.Haskell.TH.Syntax (
@@ -119,13 +120,15 @@ instance Monoid ConstructorFrequencies where
 instance Constructable ConstructorFrequencies where
   x <:> xs = MkConstructorFrequencies [x] <> xs
 
+type MeanSize = Int
+
 -- |
 --  System of algebraic data types.
 data System = System
   { -- | Target type of the system.
     targetType :: Name
   , -- | Target mean size of the target types.
-    meanSize :: Int
+    meanSize :: MeanSize
   , -- | Weights of all constructors in the system.
     weights :: ConstructorWeights
   , -- | Frequencies of selected constructors in the system.

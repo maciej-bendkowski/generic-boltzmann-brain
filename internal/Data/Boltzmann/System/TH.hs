@@ -1,9 +1,12 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Data.Boltzmann.System.TH (
   mkBoltzmannSampler,
   mkDefBoltzmannSampler,
+  LowerBound (..),
+  UpperBound (..),
 ) where
 
 import qualified Data.Map.Strict as Map
@@ -33,6 +36,7 @@ import Data.Boltzmann.Sampler.TH (
   targetTypeSynonym,
  )
 import Data.Boltzmann.System (
+  MeanSize,
   System (
     System,
     frequencies,
@@ -46,7 +50,13 @@ import Data.Boltzmann.System (
 import Data.Coerce (coerce)
 import Data.Default (def)
 import Data.Functor ((<&>))
-import Language.Haskell.TH (Exp (LamCaseE), Name, Q, Type (ArrowT, ListT))
+import Language.Haskell.TH (
+  Exp (LamCaseE),
+  Name,
+  Pat (ConP),
+  Q,
+  Type (ArrowT, ListT),
+ )
 import Language.Haskell.TH.Datatype (
   ConstructorInfo (constructorFields, constructorName),
   DatatypeInfo (datatypeCons),
@@ -70,6 +80,16 @@ import Language.Haskell.TH.Syntax (
   mkName,
   newName,
  )
+
+-- | Lower bound for rejection samplers.
+newtype LowerBound = MkLowerBound Int
+  deriving stock (Show)
+  deriving newtype (Ord, Eq, Num)
+
+-- | Upper bound for rejection samplers.
+newtype UpperBound = MkUpperBound Int
+  deriving stock (Show)
+  deriving newtype (Ord, Eq, Num)
 
 type SamplerGen a = ReaderT (SamplerCtx ()) Q a
 
@@ -108,7 +128,7 @@ toTypeVariant typ = fail $ "Unsupported type " ++ show typ
 mkConstrCoerce :: TypeVariant -> ConstructorInfo -> SamplerGen Exp
 mkConstrCoerce tv info = do
   typeVariants <- mapM toTypeVariant (constructorFields info)
-  let constrType = foldr arr (convert tv) (map convert typeVariants)
+  let constrType = foldr (arr . convert) (convert tv) typeVariants
 
   typSynonym <- findTypeSyn tv
   synonyms <- mapM findTypeSyn typeVariants
@@ -156,9 +176,9 @@ mkCaseConstr = \case
           \case
             0 -> pure ([], 0)
             1 -> do
-              (x, w) <- $(sampleExp typSynonym) ub
-              (xs, ws) <- $(sampleExp listTypSynonym) (ub - w)
-              pure ((x : xs), w + ws)
+              (x, w) <- $(sampleExp typSynonym) (coerce ub)
+              (xs, ws) <- $(sampleExp listTypSynonym) (coerce $ ub - w)
+              pure (x : xs, w + ws)
           |]
 
 sampleExp :: Type -> Q Exp
@@ -189,7 +209,7 @@ mkArgExpr constr = do
       (patX, expX) <- mkPatExp "x"
       (patW, expW) <- mkPatExp "w"
 
-      sampleExp <- lift [|sample (ub - $(pure weight))|]
+      sampleExp <- lift [|sample $ coerce (ub - $(pure weight))|]
       weightExp <- lift [|$(pure weight) + $(pure expW)|]
       let stmt = BindS (TupP [patX, patW]) sampleExp
 
@@ -260,12 +280,13 @@ mkSamplerExp typ = do
   choiceExp <- mkChoice typ
   caseExp <- mkCaseConstr typ
 
-  ub <- lift $ mkPat "ub"
+  ub' <- lift $ mkPat "ub"
+  ub <- lift $ pure $ ConP 'MkUpperBound [BangP ub']
   exp <- lift [|$(pure choiceExp) >>= ($(pure caseExp))|]
 
   pure $
     LamE
-      [BangP ub]
+      [ub]
       ( DoE
           Nothing
           [ NoBindS guardExp
@@ -321,7 +342,7 @@ mkBoltzmannSampler sys = do
 --  the corresponding system using @mkBoltzmannSampler@. Default constructor
 --  weights are used (see @mkDefWeights@). No custom constructor frequencies are
 --  assumed.
-mkDefBoltzmannSampler :: Name -> Int -> Q [Dec]
+mkDefBoltzmannSampler :: Name -> MeanSize -> Q [Dec]
 mkDefBoltzmannSampler typ meanSize = do
   defWeights <- mkDefWeights' typ
   mkBoltzmannSampler $

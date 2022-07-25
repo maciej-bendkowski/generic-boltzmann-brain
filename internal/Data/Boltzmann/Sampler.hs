@@ -25,6 +25,8 @@ import Data.Boltzmann.BuffonMachine (BuffonMachine, eval)
 import Data.Coerce (coerce)
 import System.Random (RandomGen)
 
+import Data.Boltzmann.System (MeanSize)
+import Data.Boltzmann.System.TH (LowerBound (..), UpperBound (..))
 import qualified Test.QuickCheck as QuickCheck (Gen)
 import qualified Test.QuickCheck.Gen as QuickCheck (Gen (MkGen))
 import qualified Test.QuickCheck.Random as QuickCheck (QCGen (QCGen))
@@ -34,15 +36,7 @@ class BoltzmannSampler a where
   -- |
   --  Samples a random object of type @a@. If the object size is larger than
   --  the given upper bound parameter, @Nothing@ is returned instead.
-  sample :: RandomGen g => Int -> MaybeT (BuffonMachine g) (a, Int)
-
--- | Lower bound for rejection samplers.
-newtype LowerBound = MkLowerBound Int
-  deriving (Show)
-
--- | Upper bound for rejection samplers.
-newtype UpperBound = MkUpperBound Int
-  deriving (Show)
+  sample :: RandomGen g => UpperBound -> MaybeT (BuffonMachine g) (a, Int)
 
 -- |
 --  Rejection sampler for type @a@. Given lower and upper bound @lb@ and @ub@
@@ -67,7 +61,7 @@ rejectionSampler lb ub = do
 --  determine the admissible size window @[(1-eps) n, (1+eps) n]@ centered
 --  around the given size @n@.
 toleranceRejectionSampler ::
-  (RandomGen g, BoltzmannSampler a) => Int -> Double -> BuffonMachine g a
+  (RandomGen g, BoltzmannSampler a) => MeanSize -> Double -> BuffonMachine g a
 toleranceRejectionSampler n eps = rejectionSampler lb ub
   where
     lb = MkLowerBound $ floor $ (1 - eps) * fromIntegral n
