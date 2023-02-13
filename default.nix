@@ -5,7 +5,7 @@
 }:
 mkDerivation {
   pname = "generic-boltzmann-brain";
-  version = "0.1.0.0";
+  version = "0.2.0.0";
   src = ./.;
   libraryHaskellDepends = [
     base containers mtl multiset process tasty tasty-hunit
