@@ -1,21 +1,7 @@
-resolver:
-  url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/18/16.yaml
-
-compiler: ghc-9.0.2
-
-setup-info:
-  ghc:
-    linux64-tinfo6:
-      9.0.2:
-        url: "https://downloads.haskell.org/ghc/9.0.2/ghc-9.0.2a-x86_64-fedora27-linux.tar.xz"
-
+resolver: lts-20.11
 packages:
 - .
 
 extra-deps:
-- criterion-1.5.12.0
-- testing-feat-1.1.0.0
 - git: https://github.com/maciej-bendkowski/paganini-hs
-  commit: f6f4f8d26c30544d17eab63583d4ff5e9158d2d9
-- git: https://github.com/OctopiChalmers/BinderAnn
-  commit: 8f082b23ebd4e79e86e934f41ddfcba59652fadd
+  commit: 214013fdc8aa274d2e92d50484bc0f840bf77f18

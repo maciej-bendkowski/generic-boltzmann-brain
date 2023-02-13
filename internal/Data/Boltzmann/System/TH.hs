@@ -281,7 +281,7 @@ mkSamplerExp typ = do
   caseExp <- mkCaseConstr typ
 
   ub' <- lift $ mkPat "ub"
-  ub <- lift $ pure $ ConP 'MkUpperBound [BangP ub']
+  ub <- lift $ pure $ ConP 'MkUpperBound [] [BangP ub']
   exp <- lift [|$(pure choiceExp) >>= ($(pure caseExp))|]
 
   pure $
