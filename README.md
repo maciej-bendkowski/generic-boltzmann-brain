@@ -16,7 +16,7 @@ If you use *Generic Boltzmann Brain* or its components for published work,  we e
 
 *Maciej Bendkowski*
 
-[Automatic compile-time synthesis of entropy-optimal Boltzmann samplers](https://maciej-bendkowski.github.io/generic-boltzmann-brain.pdf)
+[Automatic compile-time synthesis of entropy-optimal Boltzmann samplers](https://arxiv.org/abs/2206.06668)
 
 ### Quick overview
 
